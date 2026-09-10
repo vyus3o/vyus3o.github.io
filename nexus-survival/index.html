@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEXUS SURVIVAL — Prototype</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" width="1280" height="720"></canvas>
+
+    <section id="menu" class="panel screen active">
+      <div class="brand">NEXUS <span>SURVIVAL</span></div>
+      <p class="subtitle">협동형 서바이벌 디펜스 RPG · 1차 플레이어블 프로토타입</p>
+
+      <div class="menu-grid">
+        <div>
+          <h3>직업 선택</h3>
+          <div id="classButtons" class="cards compact"></div>
+        </div>
+        <div>
+          <h3>난이도</h3>
+          <div id="difficultyButtons" class="difficulty-row"></div>
+          <h3 class="mt">멀티 인원 난이도 보정</h3>
+          <div id="partyButtons" class="difficulty-row"></div>
+          <p class="hint">현재 빌드는 싱글 클라이언트입니다. 인원 선택은 실제 멀티 밸런스 배율을 미리 적용합니다.</p>
+        </div>
+      </div>
+
+      <div class="menu-bottom">
+        <div class="controls"><b>조작</b> WASD 이동 · 자동 공격 · ESC 일시정지 · B 보스 테스트 소환</div>
+        <button id="startBtn" class="primary">게임 시작</button>
+      </div>
+    </section>
+
+    <div id="hud" class="hud hidden">
+      <div class="top-left glass">
+        <div><b id="stageLabel">STAGE 1</b> <span id="stageName"></span></div>
+        <div><span id="difficultyLabel"></span> · <span id="timeLabel">00:00</span></div>
+      </div>
+      <div class="nexus-wrap glass">
+        <div class="bar-title"><b>NEXUS</b><span id="nexusText"></span></div>
+        <div class="bar"><div id="nexusHp" class="fill nexus"></div></div>
+        <div class="bar small"><div id="nexusCore" class="fill core"></div></div>
+        <div class="tiny" id="nexusLevel">Lv.1</div>
+      </div>
+      <div id="bossHud" class="boss-wrap glass hidden">
+        <div class="bar-title"><b id="bossName">BOSS</b><span id="bossText"></span></div>
+        <div class="bar"><div id="bossHp" class="fill boss"></div></div>
+      </div>
+      <div class="bottom-left glass">
+        <div class="bar-title"><b id="classLabel">전사</b><span id="playerHpText"></span></div>
+        <div class="bar"><div id="playerHp" class="fill hp"></div></div>
+        <div class="bar xpbar"><div id="playerXp" class="fill xp"></div></div>
+        <div class="tiny"><span id="levelLabel">Lv.1</span> · <span id="statsLabel"></span></div>
+      </div>
+      <div id="skillHud" class="skill-hud glass"></div>
+    </div>
+
+    <section id="choiceModal" class="modal hidden">
+      <div class="modal-box wide">
+        <div class="modal-title" id="choiceTitle">레벨 업</div>
+        <div id="choiceCards" class="cards"></div>
+        <button id="nexusInvestBtn" class="nexus-btn">이번 성장을 넥서스에 투자 <small>CORE EXP +100</small></button>
+      </div>
+    </section>
+
+    <section id="treasureModal" class="modal hidden">
+      <div class="modal-box treasure-box">
+        <div class="chest">▣</div>
+        <div class="modal-title">BOSS TREASURE</div>
+        <div id="treasureText" class="treasure-text"></div>
+        <button id="treasureBtn" class="primary">획득</button>
+      </div>
+    </section>
+
+    <section id="nexusModal" class="modal hidden">
+      <div class="modal-box wide">
+        <div class="modal-title">NEXUS MODULE</div>
+        <div class="sub">기지 레벨 상승 · 강화 1개 선택</div>
+        <div id="nexusCards" class="cards"></div>
+      </div>
+    </section>
+
+    <section id="transitionModal" class="modal hidden">
+      <div class="modal-box transition-box">
+        <div class="modal-title" id="transitionTitle">STAGE CLEAR</div>
+        <div id="transitionText"></div>
+        <button id="nextStageBtn" class="primary">다음 스테이지</button>
+      </div>
+    </section>
+
+    <section id="endModal" class="modal hidden">
+      <div class="modal-box transition-box">
+        <div class="modal-title" id="endTitle">GAME OVER</div>
+        <div id="endText"></div>
+        <button id="restartBtn" class="primary">메뉴로</button>
+      </div>
+    </section>
+
+    <div id="toast"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="game-loader.js"></script>
+</body>
+</html>
