@@ -77,7 +77,10 @@ try{
   const mp=mobile.page;
   await mp.click('#start');
   await mp.waitForFunction(()=>eval("state==='play'&&!!g"),{timeout:5000});
-  await mp.waitForSelector('#joystick',{timeout:3000});
+  await mp.waitForFunction(()=>{
+    const j=document.getElementById('joystick'),r=j?.getBoundingClientRect();
+    return !!j&&r.width>0&&r.height>0;
+  },{timeout:5000});
   const mobileUi=await mp.evaluate(()=>{
     const j=document.getElementById('joystick'),d=document.getElementById('raidDashBtn');
     const r=j?.getBoundingClientRect();
