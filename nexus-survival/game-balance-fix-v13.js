@@ -10,11 +10,12 @@ if(typeof addZone==='function'){
   return prevAddZone(type,x,y,r,life,ownerId,dmg,o);
  };
 }
-/* Reset transient base-zone mitigation before each combat step and apply timed movement buffs. */
+/* Reset transient mitigation, clamp boosted HP, and apply timed movement buffs. */
 if(typeof updatePlayers==='function'){
  const prevPlayers=updatePlayers;
  updatePlayers=function(dt){
   if(g)for(const p of Object.values(g.players)){
+   if(p.hp>p.max)p.hp=p.max;
    p.damageReduce=0;
    if((p._seraphWingUntil||0)>g.t){p.speedBuff=Math.max(p.speedBuff||1,1+(p._seraphWingSpeed||0));p.speedBuffUntil=Math.max(p.speedBuffUntil||0,p._seraphWingUntil)}
   }
@@ -38,5 +39,15 @@ if(typeof damagePlayer==='function'){
 if(typeof doBasicAttack==='function'){
  const prevBasic=doBasicAttack;
  doBasicAttack=function(p,t){const rate=p.rate,crit=p.crit;if((p._bloodlustUntil||0)>(g?.t||0))p.rate*=1-Math.min(.20,p._bloodlustSpeed||0);if((p._huntUntil||0)>(g?.t||0))p.crit=Math.min(.65,p.crit+(p._huntCrit||0));const out=prevBasic(p,t);p.rate=rate;p.crit=crit;return out};
+}
+/* In multiplayer the authoritative host must pause simulation while boss treasure is open. */
+if(typeof openChest==='function'){
+ const prevOpenChest=openChest;
+ openChest=function(){
+  const out=prevOpenChest();
+  const chest=document.getElementById('chestModal');
+  if(g&&NET.mode==='host'&&state==='play'&&chest&&!chest.classList.contains('hidden'))state='chest';
+  return out;
+ };
 }
 })();
