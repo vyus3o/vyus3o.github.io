@@ -1,0 +1,11 @@
+{
+  "name": "NEXUS SURVIVAL",
+  "short_name": "NEXUS",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#070a0c",
+  "theme_color": "#101714",
+  "description": "최대 4인 협동 넥서스 서바이벌 디펜스"
+}
