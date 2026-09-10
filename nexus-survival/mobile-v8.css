@@ -1,0 +1,84 @@
+/* NEXUS SURVIVAL mobile portrait build 0.8 */
+html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+#portraitNotice,#mobileControls,#mobilePauseOverlay,#mobileFullscreen{display:none}
+
+@media (pointer:coarse){
+  html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#050807}
+  #wrap{position:fixed!important;inset:0!important;width:100dvw!important;height:100dvh!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;background:#050807}
+
+  /*
+    게임 내부 해상도는 1280x720을 유지한다.
+    세로 모바일에서는 캔버스를 찌그러뜨리지 않고 높이에 맞춰 확대한 뒤
+    플레이어가 위치하는 화면 중앙부만 세로 뷰포트에 노출한다.
+    이 방식은 추후 Capacitor 앱 패키징에서도 그대로 사용할 수 있다.
+  */
+  #c{position:absolute!important;top:50%!important;left:50%!important;width:auto!important;height:100dvh!important;min-width:0!important;max-width:none!important;transform:translate(-50%,-50%);transform-origin:center;touch-action:none;image-rendering:pixelated}
+  .scan{position:absolute;inset:0;z-index:2}
+
+  /* ---------- 세로 모바일 메뉴 ---------- */
+  .panel{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:radial-gradient(circle at 50% 24%,#1a261d 0,#0a100d 44%,#050706 100%)}
+  .frame{width:100%!important;height:100%!important;max-height:none!important;border:0!important;padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom))!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;background:linear-gradient(180deg,#0b110fe8 0,#080d0bfa 100%);box-shadow:none!important}
+  .frame:before,.frame:after{display:none}
+  .statusline{font-size:9px;letter-spacing:1.7px;padding-bottom:8px;color:#77867d}
+  .menuLayout{display:block!important;padding-top:14px!important}
+  .manual{display:none!important}
+  .eyebrow{font-size:9px;letter-spacing:1.8px}
+  .heroTitle{font-size:clamp(38px,12vw,56px)!important;line-height:.9!important;letter-spacing:-3px!important;margin:8px 0 12px!important}
+  .lead{display:block!important;font-size:11px!important;line-height:1.5!important;margin-bottom:18px!important;color:#aab6ae!important}
+  .sectionLabel{font-size:9px!important;margin:14px 0 7px!important;letter-spacing:1.8px}
+  .modeRow{display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px!important}
+  .modeBtn{min-height:44px;padding:8px 5px!important;font-size:9px!important;line-height:1.2}
+  .multiBox{padding:10px!important;margin-top:8px!important}
+  .roomLine,.joinRow{gap:6px!important}.roomLine b{font-size:18px!important;letter-spacing:2px}.miniBtn{min-height:38px;padding:7px 10px!important}.joinRow input{min-height:42px;font-size:14px!important}
+  .lobbyPlayers{gap:5px!important}.lobbyChip{font-size:9px!important;padding:5px 7px!important}
+  .classes{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}
+  .classCard{min-height:76px!important;padding:12px 10px!important}.classCard b{font-size:15px!important}.classCard small{font-size:10px!important}.pix{font-size:22px!important;right:10px!important;top:9px!important}
+  .diffs{display:grid!important;grid-template-columns:repeat(3,1fr);gap:6px!important}.diffBtn{min-height:40px;padding:8px 5px!important;font-size:9px!important}.diffBtn:nth-child(n+4){grid-column:auto}
+  .startBtn{position:sticky;bottom:0;z-index:2;min-height:52px;margin-top:14px!important;padding:13px!important;font-size:12px!important;box-shadow:0 -10px 24px #080d0bcc}
+  #mobileFullscreen{display:block;width:100%;margin:8px 0 2px;border:1px solid #425047;background:#101714;color:#b7c4ba;padding:11px;font-size:10px;font-weight:800;letter-spacing:.08em;touch-action:manipulation}
+
+  /* ---------- 세로 모바일 HUD ---------- */
+  #hud{position:absolute;inset:0;z-index:3;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .hudbox{background:#07100ce8;border-color:#3d4a44;padding:7px 9px;box-shadow:0 5px 18px #0008;backdrop-filter:blur(3px)}
+  .hudbox.left{left:max(8px,calc(env(safe-area-inset-left) + 6px))!important;right:max(8px,calc(env(safe-area-inset-right) + 6px))!important;top:max(8px,calc(env(safe-area-inset-top) + 5px))!important;width:auto!important;min-width:0!important;height:42px;padding:6px 9px!important;display:grid;grid-template-columns:1fr auto;grid-template-rows:1fr 1fr;column-gap:8px}
+  .hudbox.left #stage{font-size:11px;grid-column:1;grid-row:1}.hudbox.left #time{grid-column:2;grid-row:1;text-align:right;margin:0}.hudbox.left #enemyInfo{grid-column:1/3;grid-row:2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hudbox.top{left:max(8px,calc(env(safe-area-inset-left) + 6px))!important;right:max(8px,calc(env(safe-area-inset-right) + 6px))!important;top:max(56px,calc(env(safe-area-inset-top) + 51px))!important;transform:none!important;width:auto!important;padding:7px 9px!important}
+  .hudbox.right{right:max(8px,calc(env(safe-area-inset-right) + 6px))!important;top:max(144px,calc(env(safe-area-inset-top) + 139px))!important;width:95px!important;padding:5px 7px!important;text-align:right;background:#07100cb8}
+  .hudbox.right .tiny{font-size:7px!important}.hudbox.right .hudTitle{font-size:10px!important}
+  .hudbox.bottom{left:max(8px,calc(env(safe-area-inset-left) + 6px))!important;right:max(8px,calc(env(safe-area-inset-right) + 6px))!important;bottom:max(168px,calc(env(safe-area-inset-bottom) + 162px))!important;width:auto!important;padding:7px 9px!important}
+  .brandCorner{display:none!important}
+  .hudTitle{font-size:11px}.tiny{font-size:8px!important}.bar{height:7px!important;margin-top:3px!important}.skillTags{max-height:31px;overflow:hidden;margin-top:4px!important}.skillTag{font-size:7px!important;padding:2px 4px!important}.bosswrap{margin-top:5px!important;padding-top:5px!important}
+
+  /* ---------- 레벨업 / 보상 / 게임오버 ---------- */
+  .modal{padding:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));align-items:center;overflow:hidden}
+  .modalbox{width:100%!important;max-width:480px!important;max-height:94dvh!important;padding:15px 12px!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y}
+  .modalTitle{font-size:24px!important;line-height:1.05}.modalSub{font-size:9px!important;line-height:1.4;margin:5px 0 10px!important}
+  .choices{grid-template-columns:1fr!important;gap:8px!important}
+  .choice{min-height:0!important;padding:11px 12px!important;display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:start}
+  .choice small{grid-column:1/3;font-size:8px!important}.choice h3{grid-column:1;font-size:16px!important;margin:5px 0 2px!important}.choice .lv{grid-column:2;grid-row:2;font-size:9px!important;margin-top:7px;text-align:right}.choice p{grid-column:1/3;font-size:10px!important;line-height:1.42!important;margin:5px 0!important}.choice .next{grid-column:1/3;font-size:9px!important;margin-top:5px!important;padding-top:6px!important}
+  .nexusBtn{position:sticky;bottom:-15px;z-index:2;min-height:48px;margin-top:9px!important;padding:10px!important;font-size:10px!important;background:#211a2bf5}
+  .rewardBox{max-width:390px!important}.rewardText{font-size:12px!important;line-height:1.55!important;margin:10px 0!important}.chestIcon{width:50px!important;height:36px!important;margin:13px auto!important}.rewardBtn{min-height:49px!important;padding:12px!important;margin-top:8px!important;font-size:12px!important}.restartBtn{background:#d8ff65!important;color:#10150c!important}
+
+  /* ---------- 조이스틱 / 모바일 컨트롤 ---------- */
+  #mobileControls{position:absolute;inset:0;z-index:7;display:block;pointer-events:none}
+  #joystick{position:absolute;left:max(22px,calc(env(safe-area-inset-left) + 16px));bottom:max(24px,calc(env(safe-area-inset-bottom) + 16px));width:132px;height:132px;border-radius:50%;border:2px solid #d8ff6555;background:#07100c7a;box-shadow:inset 0 0 32px #0009,0 8px 25px #0008;pointer-events:auto;touch-action:none}
+  #joystick:before,#joystick:after{content:"";position:absolute;background:#d8ff6528;pointer-events:none}#joystick:before{width:1px;height:102px;left:65px;top:14px}#joystick:after{height:1px;width:102px;top:65px;left:14px}
+  #joyKnob{position:absolute;width:56px;height:56px;left:38px;top:38px;border-radius:50%;border:2px solid #d8ff65a8;background:#273420e8;box-shadow:0 4px 18px #000c,inset 0 0 13px #d8ff6525;transform:translate(0,0);will-change:transform}
+  #joyLabel{position:absolute;left:0;right:0;bottom:-17px;text-align:center;font-size:8px;color:#d8ff6585;letter-spacing:.14em}
+  #mobileActions{position:absolute;right:max(20px,calc(env(safe-area-inset-right) + 14px));bottom:max(28px,calc(env(safe-area-inset-bottom) + 18px));display:flex;flex-direction:column;gap:9px;align-items:center;pointer-events:auto}
+  .mobBtn{width:58px;height:58px;border-radius:50%;border:2px solid #8ba09a80;background:#0c1512d9;color:#dfe7e1;font-size:8px;font-weight:900;letter-spacing:.06em;box-shadow:0 5px 20px #0009;touch-action:manipulation}.mobBtn:active{transform:scale(.95);border-color:#d8ff65;color:#d8ff65}
+  #mobilePauseBtn{width:54px;height:54px}
+
+  #mobilePauseOverlay{position:absolute;inset:0;z-index:9;display:none;place-items:center;background:#030605a5;pointer-events:none}#mobilePauseOverlay.show{display:grid}#mobilePauseOverlay .pauseCard{border:1px solid #516057;background:#0b110ef0;padding:18px 28px;text-align:center;color:#d8ff65;font-weight:900;letter-spacing:.12em}#mobilePauseOverlay small{display:block;color:#9ca9a0;font-weight:400;margin-top:7px;letter-spacing:0}
+
+  /* 모바일을 가로로 돌렸을 때 세로 사용 안내 */
+  #portraitNotice{position:fixed;inset:0;z-index:999;display:none;place-items:center;background:#060908;color:#edf2e9;text-align:center;padding:30px;touch-action:none}
+  #portraitNotice .phoneIcon{width:42px;height:70px;border:3px solid #d8ff65;border-radius:8px;margin:0 auto 15px;position:relative}#portraitNotice .phoneIcon:after{content:"";position:absolute;left:50%;bottom:4px;width:5px;height:5px;border-radius:50%;background:#d8ff65;transform:translateX(-50%)}
+  #portraitNotice b{display:block;font-size:19px;margin-bottom:7px}#portraitNotice span{font-size:11px;color:#95a198;line-height:1.5}
+}
+
+@media (pointer:coarse) and (orientation:landscape){#portraitNotice{display:grid!important}}
+
+/* 작은 세로폰 */
+@media (pointer:coarse) and (orientation:portrait) and (max-height:720px){
+  .heroTitle{font-size:36px!important}.lead{display:none!important}.sectionLabel{margin:9px 0 5px!important}.classCard{min-height:58px!important}.startBtn{min-height:46px!important}.hudbox.bottom{bottom:max(142px,calc(env(safe-area-inset-bottom) + 136px))!important}.choice p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.choice{padding:8px 10px!important}.modalTitle{font-size:20px!important}#joystick{width:112px;height:112px;left:max(16px,calc(env(safe-area-inset-left) + 10px));bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px))}#joyKnob{width:48px;height:48px;left:32px;top:32px}#joystick:before{height:86px;left:55px;top:12px}#joystick:after{width:86px;top:55px;left:12px}}
