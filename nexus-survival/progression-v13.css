@@ -1,0 +1,34 @@
+/* NEXUS SURVIVAL advancement / ultimate UI build 0.13 */
+#advancementModal{z-index:130}
+.advanceBox{max-width:980px!important;text-align:center;overflow:auto}
+.advanceCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.advanceCard,.awakenCard{--adv-col:#d8ff65;border:1px solid color-mix(in srgb,var(--adv-col) 72%,#34423b);background:linear-gradient(180deg,#151d19,#0d1411);color:#eef3ed;padding:18px;text-align:left;min-height:270px;position:relative;box-shadow:inset 0 0 0 1px #ffffff08;cursor:pointer}
+.advanceCard:before,.awakenCard:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--adv-col);box-shadow:0 0 18px color-mix(in srgb,var(--adv-col) 65%,transparent)}
+.advanceCard:hover{transform:translateY(-2px);border-color:var(--adv-col);box-shadow:0 10px 30px #0008,inset 0 0 28px color-mix(in srgb,var(--adv-col) 8%,transparent)}
+.advanceCard small,.awakenCard small{font-size:9px;letter-spacing:1.8px;color:var(--adv-col)}
+.advanceCard h2,.awakenCard h2{font-size:25px;margin:8px 0 12px;color:#fff}
+.advanceCard p,.awakenCard p{font-size:11px;line-height:1.55;color:#aab6ae;margin:9px 0}.advanceCard p b{color:#edf3ed}
+.advPassive{border:1px solid #344039;background:#0a100d;padding:10px}
+.transformList{display:grid;gap:5px;margin:12px 0}.transformList span{font-size:10px;color:#c7d0c9;padding-left:13px;position:relative}.transformList span:before{content:"+";position:absolute;left:0;color:var(--adv-col)}
+.advanceCard strong,.awakenCard strong{display:block;margin-top:12px;padding-top:10px;border-top:1px solid #36423c;color:var(--adv-col);font-size:10px;line-height:1.5}
+.awakenCard{max-width:520px;min-height:0;margin:18px auto;text-align:center;padding:25px}.awakenCard h2{font-size:31px;color:var(--adv-col)}
+.advWait{margin-top:18px;border:1px solid #3f4a45;background:#0b100e;padding:14px;color:#b1bdb5;font-size:11px;letter-spacing:.6px}
+.advChoice{border-color:#775f9d!important;background:linear-gradient(180deg,#191625,#11151a)!important}.advChoice .next{color:#c7a9f3!important}
+#ultHud{position:absolute;right:18px;bottom:126px;z-index:27;border:1px solid #74688a;background:#0d0a13dd;color:#efe5ff;padding:8px 11px;font:900 11px Arial,sans-serif;letter-spacing:.4px;pointer-events:none;box-shadow:0 5px 18px #0008}
+#ultBtn{display:none;position:absolute;z-index:45;border-radius:50%;border:2px solid var(--ult-col,#cda7ff);background:radial-gradient(circle at 38% 30%,#3a2f46 0,#18131f 58%,#09070d 100%);color:#fff;box-shadow:0 7px 24px #000b,inset 0 0 20px color-mix(in srgb,var(--ult-col,#cda7ff) 15%,transparent);font:900 9px/1.18 Arial,sans-serif;white-space:pre-line;text-align:center;touch-action:none;-webkit-tap-highlight-color:transparent}
+#ultBtn.show{display:none}#ultBtn:disabled{opacity:.48;filter:saturate(.55)}#ultBtn:active{transform:scale(.94);filter:brightness(1.25)}
+
+@media (pointer:coarse){
+ #ultHud{display:none!important}
+ #ultBtn.show{display:block!important;position:fixed!important;right:23px!important;bottom:101px!important;width:57px!important;height:57px!important;font-size:7px!important;line-height:1.15!important}
+ #raidDashBtn{bottom:18px!important;right:14px!important}
+ #mobileActions{right:91px!important;bottom:20px!important;flex-direction:row!important}
+ #mobilePauseBtn{width:38px!important;height:38px!important}
+ .advanceBox{width:calc(100vw - 16px)!important;max-width:none!important;max-height:calc(var(--nexus-vh,100svh) - 16px)!important;padding:14px 11px!important}
+ .advanceBox .modalTitle{font-size:22px!important}.advanceBox .modalSub{font-size:9px!important;margin-bottom:8px!important}
+ .advanceCards{grid-template-columns:1fr!important;gap:9px!important;margin-top:9px!important}
+ .advanceCard{min-height:0!important;padding:12px!important}.advanceCard h2{font-size:20px!important;margin:5px 0 7px!important}.advanceCard p{font-size:9px!important;line-height:1.4!important;margin:6px 0!important}.advPassive{padding:7px!important}.transformList{margin:7px 0!important;gap:3px!important}.transformList span{font-size:8px!important}.advanceCard strong{font-size:8px!important;margin-top:7px!important;padding-top:7px!important}
+ .awakenCard{padding:16px!important;margin:10px auto!important}.awakenCard h2{font-size:24px!important}.awakenCard p{font-size:9px!important}
+ .advWait{font-size:9px!important;padding:11px!important;margin-top:10px!important}
+}
+@media (pointer:coarse) and (max-width:390px){#ultBtn.show{right:20px!important;bottom:91px!important;width:52px!important;height:52px!important}.advanceCard p:nth-of-type(2){display:none}.transformList span:nth-child(n+3){display:none}}
