@@ -10,9 +10,10 @@
 <meta name="apple-mobile-web-app-title" content="NEXUS SURVIVAL">
 <meta name="screen-orientation" content="portrait">
 <title>NEXUS SURVIVAL</title>
-<link rel="manifest" href="manifest.webmanifest?v=11">
-<link rel="stylesheet" href="style.css?v=11">
-<link rel="stylesheet" href="mobile-v8.css?v=11">
+<link rel="manifest" href="manifest.webmanifest?v=12">
+<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="mobile-v8.css?v=12">
+<link rel="stylesheet" href="mobile-v12.css?v=12">
 </head>
 <body>
 <div id="wrap">
@@ -23,7 +24,7 @@
     <div class="statusline">FORTRESS LINK // STANDBY</div>
     <div class="menuLayout">
       <div>
-        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 11</div>
+        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 12</div>
         <div class="heroTitle">NEXUS<span>SURVIVAL.</span></div>
         <div class="lead">넥서스를 지키며 성장하는 최대 4인 협동 서바이벌 디펜스. PC와 모바일이 같은 방에서 플레이할 수 있습니다.</div>
 
@@ -53,10 +54,10 @@
         <button id="start" class="startBtn">START RUN // 생존 시작</button>
       </div>
       <div class="manual">
-        <h3>FIELD MANUAL / 11</h3>
+        <h3>FIELD MANUAL / 12</h3>
         <p><b>PC</b><br>WASD 이동 · SPACE 직업별 회피기 · 공격 자동 · B 보스 테스트 소환</p>
-        <p><b>DASH</b><br>전사 돌진 · 궁수 구르기 · 마법사 순간이동 · 성직자 성광 도약. 회피 동작 중에는 짧은 무적 시간이 적용됩니다.</p>
-        <p><b>MOBILE</b><br>세로 화면 전용 UI입니다. 왼쪽 가상 조이스틱으로 이동하고 오른쪽 회피 버튼을 사용합니다. 공격은 자동입니다.</p>
+        <p><b>DASH</b><br>전사 돌진 · 궁수 구르기 · 마법사 순간이동 · 성직자 성광 도약. 회피 후 멈춤 없이 이동 입력이 자연스럽게 이어집니다.</p>
+        <p><b>MOBILE</b><br>세로 화면 전용 UI입니다. 왼쪽 조이스틱으로 이동하고 오른쪽 회피 버튼을 사용합니다. HUD와 조작부를 작게 정리해 전투 시야를 넓혔습니다.</p>
         <p><b>RAID BOSS</b><br>보스 공격은 원형·직선·부채꼴·고리형 위험 구역이 먼저 표시된 뒤 실제 판정이 발생합니다. 체력이 낮아질수록 2·3페이즈로 전환되며 패턴이 강화됩니다.</p>
         <p><b>COMBAT VFX</b><br>전사·궁수·마법사·성직자의 기본 공격과 스킬은 직업별 전용 궤적·투사체·적중 효과로 구분됩니다.</p>
         <p><b>ELITE</b><br>황금 오라와 전용 체력바가 있는 엘리트 몬스터가 등장합니다. 일반 몬스터보다 강하지만 추가 경험치를 주며 처치 시 40% 확률로 체력 회복 아이템을 떨어뜨립니다.</p>
@@ -72,7 +73,7 @@
   <div class="hudbox top"><div class="row"><b>NEXUS CORE</b><span id="ntext"></span></div><div class="bar"><div id="nbar" class="fill"></div></div><div class="bar"><div id="corebar" class="fill corebar"></div></div><div class="tiny" id="core"></div><div id="bosshud" class="bosswrap hidden"><div class="row"><b id="bname"></b><span id="btext"></span></div><div class="bar"><div id="bbar" class="fill bossbar"></div></div></div></div>
   <div class="hudbox bottom"><div class="row"><b id="pname"></b><span id="ptext"></span></div><div class="bar"><div id="pbar" class="fill hp"></div></div><div class="bar"><div id="xbar" class="fill xp"></div></div><div id="lvl" class="tiny"></div><div id="skillTags" class="skillTags"></div></div>
   <div class="hudbox right"><div class="tiny">RUN DATA</div><div id="runData" class="hudTitle"></div><div id="netData" class="tiny"></div></div>
-  <div class="brandCorner">NEXUS SURVIVAL // BUILD 0.11</div>
+  <div class="brandCorner">NEXUS SURVIVAL // BUILD 0.12</div>
 </div>
 
 <div id="levelModal" class="modal hidden"><div class="modalbox"><div class="modalTitle">EVOLVE YOUR BUILD.</div><div class="modalSub">LEVEL-UP SAFE // 체력 완전 회복 · 선택하는 동안 피해를 받지 않습니다</div><div id="choices" class="choices"></div><button id="nexusBtn" class="nexusBtn">NEXUS INVESTMENT // 이번 성장을 기지에 투자 · CORE +100</button></div></div>
@@ -82,13 +83,14 @@
 </div>
 
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="game-multi.js?v=11"></script>
-<script src="game-core.js?v=11"></script>
-<script src="game-render.js?v=11"></script>
-<script src="game-polish-v6.js?v=11"></script>
-<script src="game-mobile-v8.js?v=11"></script>
-<script src="game-elite-v9.js?v=11"></script>
-<script src="game-vfx-v10.js?v=11"></script>
-<script src="game-raid-v11.js?v=11"></script>
+<script src="game-multi.js?v=12"></script>
+<script src="game-core.js?v=12"></script>
+<script src="game-render.js?v=12"></script>
+<script src="game-polish-v6.js?v=12"></script>
+<script src="game-mobile-v8.js?v=12"></script>
+<script src="game-elite-v9.js?v=12"></script>
+<script src="game-vfx-v10.js?v=12"></script>
+<script src="game-raid-v11.js?v=12"></script>
+<script src="game-mobile-v12.js?v=12"></script>
 </body>
 </html>
