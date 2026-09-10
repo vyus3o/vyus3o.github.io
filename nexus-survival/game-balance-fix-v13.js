@@ -11,16 +11,20 @@ if(typeof addZone==='function'){
   return prevAddZone(type,x,y,r,life,ownerId,dmg,o);
  };
 }
-/* Reset transient mitigation, clamp boosted HP, and apply timed movement buffs. */
+/* Recompute only legitimate base damage reduction each frame and apply timed movement buffs. */
 if(typeof updatePlayers==='function'){
  const prevPlayers=updatePlayers;
  updatePlayers=function(dt){
+  const out=prevPlayers(dt);
   if(g)for(const p of Object.values(g.players)){
    if(p.hp>p.max)p.hp=p.max;
-   p.damageReduce=0;
+   let dr=0;
+   if((p.cd?._tauntEnd||0)>0&&(p.skills?.W05||0)>0)dr=Math.max(dr,.12+.04*p.skills.W05);
+   for(const z of g.zones||[])if(z.type==='sanctuary'&&Math.hypot(p.x-z.x,p.y-z.y)<=z.r){dr=Math.max(dr,.18);break}
+   p.damageReduce=dr;
    if((p._seraphWingUntil||0)>g.t){p.speedBuff=Math.max(p.speedBuff||1,1+(p._seraphWingSpeed||0));p.speedBuffUntil=Math.max(p.speedBuffUntil||0,p._seraphWingUntil)}
   }
-  return prevPlayers(dt);
+  return out;
  };
 }
 /* Weak-point and interrogation debuffs are intentionally multiplicative but capped by their own short duration. */
@@ -64,10 +68,7 @@ function applyRemoteAdv13(p,id){
  if(typeof addFx==='function')addFx('holyburst',p.x,p.y,{r:110,col:a.col,life:.75,ownerId:p.id});
  return true;
 }
-function resumeAfterAdv13(){
- const m=document.getElementById('advancementModal');if(m)m.classList.add('hidden');
- advanceStage();state='play';if(NET.mode==='host')netBroadcast({t:'v13Resume',state:makeNetState()});
-}
+function resumeAfterAdv13(){const m=document.getElementById('advancementModal');if(m)m.classList.add('hidden');advanceStage();state='play';if(NET.mode==='host')netBroadcast({t:'v13Resume',state:makeNetState()})}
 if(typeof netHostMessage==='function'){
  const prevNetHost=netHostMessage;
  netHostMessage=function(conn,msg){
@@ -82,6 +83,30 @@ if(typeof netHostMessage==='function'){
    return;
   }
   return prevNetHost(conn,msg);
+ };
+}
+
+/* Stage transition balance: small sustain, major checkpoints, and true remaining-time cooldown carryover. */
+if(typeof advanceStage==='function'){
+ const prevAdvance=advanceStage;
+ advanceStage=function(){
+  if(!g)return prevAdvance();
+  const oldT=g.t||0,completed=(g.stage||0)+1,nexusBefore=g.n.hp;
+  const pre={};for(const p of Object.values(g.players))pre[p.id]={hp:p.hp,alive:p.alive,ult:Math.max(0,(p.ultReadyAt||0)-oldT),dash:Math.max(0,(p.dashReadyAt||0)-oldT)};
+  const out=prevAdvance();
+  const extraNexus=(completed===10||completed===30)?.08:(completed===20||completed===40)?0:.025;
+  g.n.hp=Math.min(g.n.max,nexusBefore+g.n.max*extraNexus);
+  for(const p of Object.values(g.players)){
+   const q=pre[p.id]||{hp:p.hp,alive:true,ult:0,dash:0};
+   if(completed===10||completed===30)p.hp=p.max;
+   else if(completed===20||completed===40)p.hp=q.alive?Math.max(Math.min(q.hp,p.max),p.max*.55):p.max*.40;
+   else p.hp=q.alive?Math.max(Math.min(q.hp,p.max),p.max*.30):p.max*.25;
+   p.alive=true;p.ultReadyAt=q.ult;p.dashReadyAt=q.dash;p.dashInvulUntil=0;p._dashMove=null;
+   p.atkBuff=1;p.atkBuffUntil=0;p.speedBuff=1;p.speedBuffUntil=0;p.damageReduce=0;
+   for(const k of ['_berserkUltUntil','_bloodlustUntil','_huntUntil','_dashBoostUntil','_hawkUntil','_elementalUntil','_elemUltUntil','_seraphWingUntil','_guardianUltUntil','_guardianAllyUntil','_tauntAuraUntil','_seraphSanctuaryUntil','_focusReady'])p[k]=0;
+  }
+  g.n._fortUntil=0;g.n._guardianUltUntil=0;g.n._springUntil=0;
+  return out;
  };
 }
 
