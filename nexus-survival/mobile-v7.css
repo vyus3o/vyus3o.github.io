@@ -1,0 +1,60 @@
+/* NEXUS SURVIVAL mobile build 0.7 */
+html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+#rotateNotice,#mobileControls,#mobilePauseOverlay,#mobileFullscreen{display:none}
+
+@media (pointer:coarse){
+  html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#050807}
+  #wrap{width:100dvw!important;height:100dvh!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important}
+  canvas{width:100%!important;height:100%!important;touch-action:none}
+
+  /* 모바일 게임 HUD */
+  .hudbox{padding:6px 8px;background:#07100cda;backdrop-filter:blur(2px)}
+  .hudbox.left{left:max(8px,env(safe-area-inset-left));top:max(7px,env(safe-area-inset-top));min-width:150px}
+  .hudbox.top{top:max(7px,env(safe-area-inset-top));width:min(390px,48vw)}
+  .hudbox.bottom{left:max(8px,env(safe-area-inset-left));bottom:max(7px,env(safe-area-inset-bottom));width:min(300px,38vw)}
+  .hudbox.right{right:max(8px,env(safe-area-inset-right));top:max(7px,env(safe-area-inset-top));width:126px}
+  .brandCorner{display:none}
+  .hudTitle{font-size:11px}.tiny{font-size:8px}.bar{height:7px}.skillTag{font-size:8px;padding:2px 4px}
+
+  /* 메뉴 */
+  .panel{padding:max(4px,env(safe-area-inset-top)) max(5px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(5px,env(safe-area-inset-left))}
+  .frame{width:96%;max-height:96dvh;padding:10px 14px 12px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+  .menuLayout{grid-template-columns:1fr;gap:0;padding-top:8px}.manual{display:none}.statusline{font-size:8px;padding-bottom:5px}
+  .eyebrow{font-size:8px}.heroTitle{font-size:30px;margin:5px 0 4px;letter-spacing:-2px}.lead{display:none}
+  .sectionLabel{font-size:8px;margin:7px 0 4px}.modeRow,.diffs{gap:5px}.modeBtn,.diffBtn,.miniBtn{padding:6px 8px;font-size:9px}
+  .classes{grid-template-columns:repeat(4,1fr);gap:5px}.classCard{min-height:49px;padding:6px}.classCard b{font-size:12px}.classCard small{font-size:8px}.pix{font-size:15px;right:6px;top:5px}
+  .startBtn{margin-top:7px;padding:9px;font-size:11px}.multiBox{padding:6px;margin-top:4px}.roomLine b{font-size:16px}.lobbyChip{font-size:8px;padding:3px 5px}
+  #mobileFullscreen{display:block;width:100%;margin-top:5px;border:1px solid #3b4743;background:#101714;color:#9dac9f;padding:7px;font-size:9px;letter-spacing:.08em}
+
+  /* 레벨업/보상/게임오버 - 터치하기 쉽게 */
+  .modal{padding:max(4px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .modalbox{width:min(980px,96vw);max-height:96dvh;padding:10px 12px;overflow-y:auto;touch-action:pan-y}
+  .modalTitle{font-size:20px}.modalSub{font-size:9px;margin:2px 0 8px}.choices{gap:7px}.choice{min-height:150px;padding:9px}.choice h3{font-size:14px;margin:5px 0}.choice .lv,.choice .next{font-size:9px}.choice p{font-size:9px;line-height:1.35;margin:6px 0}.choice .next{margin-top:5px;padding-top:5px}
+  .nexusBtn{margin-top:7px;padding:9px;font-size:10px}.rewardBox{max-width:520px}.rewardText{font-size:11px;margin:7px 0}.chestIcon{margin:8px auto;width:44px;height:32px}.rewardBtn{padding:11px;margin-top:7px;min-height:42px}
+  .restartBtn{background:#d8ff65;color:#10150c}
+
+  /* 가상 조이스틱 */
+  #mobileControls{position:absolute;inset:0;z-index:7;display:block;pointer-events:none}
+  #joystick{position:absolute;left:max(20px,calc(env(safe-area-inset-left) + 12px));bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));width:136px;height:136px;border-radius:50%;border:2px solid #d8ff654d;background:#07100c70;box-shadow:inset 0 0 34px #0009,0 0 18px #0008;pointer-events:auto;touch-action:none}
+  #joystick:before,#joystick:after{content:"";position:absolute;background:#d8ff6525;pointer-events:none}#joystick:before{width:1px;height:106px;left:67px;top:15px}#joystick:after{height:1px;width:106px;top:67px;left:15px}
+  #joyKnob{position:absolute;width:58px;height:58px;left:39px;top:39px;border-radius:50%;border:2px solid #d8ff65a8;background:#273420cf;box-shadow:0 4px 18px #000c,inset 0 0 13px #d8ff6525;transform:translate(0,0);will-change:transform}
+  #joyLabel{position:absolute;left:0;right:0;bottom:-16px;text-align:center;font-size:8px;color:#d8ff6580;letter-spacing:.14em}
+  #mobileActions{position:absolute;right:max(18px,calc(env(safe-area-inset-right) + 12px));bottom:max(17px,calc(env(safe-area-inset-bottom) + 12px));display:flex;gap:8px;align-items:flex-end;pointer-events:auto}
+  .mobBtn{width:66px;height:66px;border-radius:50%;border:2px solid #8ba09a80;background:#0c1512c9;color:#dfe7e1;font-size:9px;font-weight:800;letter-spacing:.07em;box-shadow:0 5px 20px #0009;touch-action:manipulation}
+  .mobBtn:active{transform:scale(.95);border-color:#d8ff65;color:#d8ff65}
+  #mobilePauseBtn{width:54px;height:54px}
+
+  #mobilePauseOverlay{position:absolute;inset:0;z-index:9;display:none;place-items:center;background:#03060599;pointer-events:none}#mobilePauseOverlay.show{display:grid}#mobilePauseOverlay .pauseCard{border:1px solid #516057;background:#0b110edb;padding:18px 34px;text-align:center;color:#d8ff65;font-weight:900;letter-spacing:.12em}#mobilePauseOverlay small{display:block;color:#9ca9a0;font-weight:400;margin-top:7px;letter-spacing:0}
+
+  /* 세로 화면에서는 플레이 대신 회전 안내 */
+  #rotateNotice{position:fixed;inset:0;z-index:999;display:none;place-items:center;background:#060908;color:#edf2e9;text-align:center;padding:30px;touch-action:none}
+  #rotateNotice .rotateIcon{font-size:54px;color:#d8ff65;display:block;margin-bottom:12px;animation:rotatePhone 1.6s ease-in-out infinite alternate}
+  #rotateNotice b{display:block;font-size:20px;margin-bottom:7px}#rotateNotice span{font-size:12px;color:#95a198}
+  @keyframes rotatePhone{from{transform:rotate(0deg)}to{transform:rotate(90deg)}}
+}
+
+@media (pointer:coarse) and (orientation:portrait){#rotateNotice{display:grid!important}}
+@media (pointer:coarse) and (max-height:390px){
+  #joystick{width:116px;height:116px;left:max(15px,calc(env(safe-area-inset-left) + 8px));bottom:max(12px,calc(env(safe-area-inset-bottom) + 8px))}#joyKnob{width:50px;height:50px;left:33px;top:33px}#joystick:before{left:57px;height:90px;top:13px}#joystick:after{top:57px;width:90px;left:13px}
+  .hudbox.bottom{width:280px}.mobBtn{width:56px;height:56px}.modalbox{padding:7px 9px}.choice{min-height:125px}.choice p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.modalTitle{font-size:17px}
+}
