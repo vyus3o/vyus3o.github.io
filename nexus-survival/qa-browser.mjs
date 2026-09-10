@@ -9,7 +9,20 @@ async function openPage(mobile=false){
   const page=await browser.newPage();
   const errors=[];
   page.on('pageerror',e=>errors.push(`pageerror: ${e.message}`));
-  page.on('console',m=>{if(m.type()==='error')errors.push(`console: ${m.text()}`)});
+  page.on('console',m=>{
+    if(m.type()!=='error')return;
+    const text=m.text();
+    if(text.includes('Failed to load resource'))return;
+    errors.push(`console: ${text}`);
+  });
+  page.on('response',r=>{
+    if(r.status()<400)return;
+    try{
+      const u=new URL(r.url());
+      if(u.pathname.endsWith('/favicon.ico'))return;
+    }catch{}
+    errors.push(`http ${r.status()}: ${r.url()}`);
+  });
   if(mobile){
     await page.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1');
     await page.setViewport({width:390,height:844,isMobile:true,hasTouch:true,deviceScaleFactor:2});
