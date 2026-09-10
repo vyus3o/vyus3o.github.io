@@ -1,0 +1,31 @@
+name: Nexus Survival QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nexus-survival/**'
+      - '.github/workflows/nexus-survival-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in nexus-survival/*.js; do
+            echo "Checking $f"
+            node --check "$f"
+          done
+      - name: Game structure QA
+        run: node nexus-survival/qa-static.mjs nexus-survival
