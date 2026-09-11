@@ -11,9 +11,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: nexus-survival-qa-main
+  cancel-in-progress: true
+
 jobs:
   qa:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +34,7 @@ jobs:
           done
       - name: Game structure QA
         run: node nexus-survival/qa-static.mjs nexus-survival
-      - name: Browser runtime smoke test
+      - name: Browser runtime + multiplayer smoke test
         shell: bash
         run: |
           set -euo pipefail
@@ -46,4 +51,30 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep .25
           done
-          CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.18' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+      - name: Wait for GitHub Pages build 0.18
+        shell: bash
+        run: |
+          set -euo pipefail
+          READY=0
+          for i in {1..90}; do
+            HTML="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}-${i}" || true)"
+            SPAWN="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-spawn-v18.js?v=18&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.18' <<<"$HTML" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN"; then
+              READY=1
+              echo "Live build 0.18 is deployed"
+              break
+            fi
+            echo "Waiting for Pages deployment... ${i}/90"
+            sleep 2
+          done
+          if [ "$READY" -ne 1 ]; then
+            echo 'GitHub Pages did not expose build 0.18 in time'
+            exit 1
+          fi
+      - name: Live GitHub Pages runtime + multiplayer test
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.18' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
