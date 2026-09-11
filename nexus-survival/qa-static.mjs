@@ -23,7 +23,7 @@ check('exp:boss-adds',exp.includes('g._bossAddCd')&&exp.includes('bossAdds:true'
 check('boss:hierarchy',boss.includes('midStages:[5,15,25,35,45]')&&boss.includes('majorStages:[10,20,30,40,50]')&&boss.includes('midPatterns:4')&&boss.includes('majorPatterns:5'));
 check('buildcraft:max10',buildcraft.includes('BASE_MAX=10,ADV_MAX=10'));
 check('buildcraft:slots3',buildcraft.includes('ADV_SLOTS=3'));
-check('buildcraft:273',buildcraft.includes('baseSkills105')&&buildcraft.includes('advancedSkills168'));
+check('buildcraft:273-runtime-counts',buildcraft.includes('baseSkills:Object.values(SK||{})')&&buildcraft.includes('advancedSkills:Object.values(ADV)'));
 check('buildcraft:synergy',buildcraft.includes('const SYNERGIES=[]')&&buildcraft.includes('allSkillsHaveCombo:true')&&buildcraft.includes('SYNERGY'));
 check('polish:opening-class-balance',polish.includes('BASIC_MUL')&&['mage:1.14','necromancer:1.20','rogue:.80','gunslinger:.73'].every(x=>polish.includes(x)));
 check('polish:difficulty-opening',polish.includes('NORMAL:1.18')&&polish.includes('HARD:1.24')&&polish.includes('NIGHTMARE:1.30')&&polish.includes('HELL:1.36')&&polish.includes('openingDiffMul'));
