@@ -19,8 +19,8 @@ const PARTY={p1:'#d8ff65',p2:'#65d5ff',p3:'#ff9f6b',p4:'#d891ff',p5:'#ff6fae'};
 const img=new Image();
 let ready=false,loadError=false;
 img.decoding='async';
-img.onload=()=>{ready=true;window.NEXUS_PIXEL_V32.ready=true;try{delete window.NEXUS_PIXEL_ATLAS_B64}catch{}};
-img.onerror=()=>{loadError=true;window.NEXUS_PIXEL_V32.loadError=true};
+img.onload=()=>{ready=true;if(window.NEXUS_PIXEL_V32){window.NEXUS_PIXEL_V32.ready=true;window.NEXUS_PIXEL_V32.loadError=false}try{delete window.NEXUS_PIXEL_ATLAS_B64}catch{}};
+img.onerror=()=>{loadError=true;if(window.NEXUS_PIXEL_V32)window.NEXUS_PIXEL_V32.loadError=true};
 img.src='data:image/png;base64,'+(window.NEXUS_PIXEL_ATLAS_B64||'');
 const oldPlayer=drawPlayer,oldEnemy=drawEnemy;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -39,4 +39,11 @@ drawEnemy=function(e){if(!ready||!e)return oldEnemy(e);const key=keyForEnemy(e),
 function applyClassCardSprites(){const cards=[...document.querySelectorAll('.classCard')];for(const card of cards){if(card.dataset.pixel32)return;const txt=(card.textContent||'').toLowerCase();let key=null;for(const k of BASE){const n=(C?.[k]?.n||'').toLowerCase();if(txt.includes(k)||(n&&txt.includes(n))){key=k;break}}if(!key)continue;card.dataset.pixel32='1';card.style.position='relative';const badge=document.createElement('canvas');badge.width=84;badge.height=72;badge.className='pixelClassPreview32';badge.style.cssText='position:absolute;right:6px;bottom:4px;width:70px;height:60px;image-rendering:pixelated;pointer-events:none;opacity:.94';const bc=badge.getContext('2d');bc.imageSmoothingEnabled=false;const a=MAP[key],scale=58/a[3],dw=a[2]*scale,dh=58;bc.drawImage(img,a[0],a[1],a[2],a[3],42-dw/2,69-dh,dw,dh);card.appendChild(badge)}}
 img.addEventListener('load',()=>{setTimeout(applyClassCardSprites,40);const mo=new MutationObserver(()=>applyClassCardSprites());const root=document.getElementById('classes');if(root)mo.observe(root,{childList:true,subtree:true})},{once:true});
 window.NEXUS_PIXEL_V32={build:BUILD,ready:false,loadError:false,source:'user-provided pixel assets v1',atlas:{w:768,h:352,embedded:true,quantizedColors:48},baseClasses:7,advancedClasses:14,commonMonsters:5,eliteMonsters:5,specialVisuals:5,bosses:3,pixelated:true,renderOnly:true,drawImageSprites:true};
+// Data URLs may finish during this script on fast/headless browsers. Repair the
+// public readiness marker deterministically if the load completed before the
+// marker object above existed; otherwise the normal onload handler will set it.
+if(img.complete){
+ if(img.naturalWidth>0){ready=true;window.NEXUS_PIXEL_V32.ready=true;window.NEXUS_PIXEL_V32.loadError=false;try{delete window.NEXUS_PIXEL_ATLAS_B64}catch{}}
+ else if(loadError)window.NEXUS_PIXEL_V32.loadError=true;
+}
 })();
