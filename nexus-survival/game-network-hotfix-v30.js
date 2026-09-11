@@ -10,10 +10,10 @@ const lastSnapAt=new WeakMap();
 const stats={snapCalls:0,snapSent:0,snapSkippedCadence:0,snapSkippedBuffer:0,highPressure:0};
 const partyN=()=>Math.max(1,Object.keys(NET?.lobby||{}).length);
 const isRelay=c=>c?.transport==='webrelay'||String(c?.peer||'').startsWith('ws:');
-const dcOf=c=>c?.dataChannel||c?._dc||c?._channel||c?.peerConnection?.dataChannel||null;
+const dcOf=c=>c?.dataChannel||c?._dc||c?._channel||null;
 function buffered(c){return Number(dcOf(c)?.bufferedAmount||0)}
 function intervalSec(conn,state){
- const n=partyN(), relay=isRelay(conn), total=(state?.e||[]).length, buf=buffered(conn);
+ const n=partyN(),relay=isRelay(conn),total=(state?.e||[]).length,buf=buffered(conn);
  let gap=n>=5?.145:n>=4?.13:n>=3?.105:.085;
  if(relay)gap=Math.max(gap,n>=4?.16:.13);
  if(total>150)gap+=.02;
@@ -25,22 +25,17 @@ function intervalSec(conn,state){
 netBroadcast=function(data){
  if(NET?.mode!=='host'||data?.t!=='snap'||!data.state)return prev(data);
  stats.snapCalls++;
- const hostT=Number(data.state.t)||0;
- const conns=[...(NET.conns?.values?.()||[])];
- if(!conns.length)return prev(data);
- let anyDue=false;
- for(const conn of conns){
+ const hostT=Number(data.state.t)||0,original=NET.conns,due=new Map();
+ for(const [key,conn] of original?.entries?.()||[]){
   if(!conn?.open)continue;
   const buf=buffered(conn);
   if(!isRelay(conn)&&buf>420*1024){stats.snapSkippedBuffer++;continue}
   const gap=intervalSec(conn,data.state),last=lastSnapAt.get(conn);
-  if(last==null||hostT-last>=gap){anyDue=true;lastSnapAt.set(conn,hostT)}
+  if(last==null||hostT-last>=gap){due.set(key,conn);lastSnapAt.set(conn,hostT)}
  }
- if(!anyDue){stats.snapSkippedCadence++;return}
+ if(!due.size){stats.snapSkippedCadence++;return}
  stats.snapSent++;
- return prev(data);
+ try{NET.conns=due;return prev(data)}finally{NET.conns=original}
 };
-const oldClose=netClose;
-netClose=function(){lastSnapAt.clear?.();return oldClose()};
-window.NEXUS_NET_HOTFIX_30={build:'0.30-hf2',adaptive4p:true,hostGameTimeThrottle:true,bufferAware:true,controlImmediate:true,stats};
+window.NEXUS_NET_HOTFIX_30={build:'0.30-hf3',adaptive4p:true,hostGameTimeThrottle:true,bufferAware:true,perClientThrottle:true,controlImmediate:true,stats};
 })();
