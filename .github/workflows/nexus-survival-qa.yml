@@ -53,7 +53,15 @@ jobs:
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           test -n "$CHROME_BIN"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.26' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.26' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs 2>&1 | tee /tmp/qa-browser.log
+      - name: Upload local regression log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-browser-log
+          path: /tmp/qa-browser.log
+          if-no-files-found: ignore
+          retention-days: 1
       - name: Local 5-player + boss hierarchy regression
         shell: bash
         run: |
