@@ -53,7 +53,7 @@ jobs:
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           test -n "$CHROME_BIN"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs 2>&1 | tee /tmp/qa-browser.log
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs 2>&1 | tee /tmp/qa-browser.log
       - name: Upload local regression log
         if: always()
         uses: actions/upload-artifact@v4
@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v24.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v24.mjs
       - name: Local buildcraft + synergy QA
         shell: bash
         run: |
@@ -80,38 +80,38 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v26.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v26.mjs
       - name: Local motion + detail QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v27.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v27.mjs
       - name: Local party pause + 5-player link QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v28.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v28.mjs
       - name: Local unified 5-player transport stress QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31.mjs
       - name: Local low-lag dual-channel 5-player QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31-smooth.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31-smooth.mjs
       - name: Local 4-player level recovery + pixel asset QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v32.mjs
-      - name: Wait for GitHub Pages build 0.32
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v32.mjs
+      - name: Wait for GitHub Pages build 0.33
         shell: bash
         run: |
           set -euo pipefail
@@ -123,16 +123,16 @@ jobs:
             PARTY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-party-sync-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
             PIXEL="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-pixel-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
             VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.32' <<<"$HTML" && grep -q 'NEXUS_NETWORK_V31' <<<"$NETWORK" && grep -q 'NEXUS_NETWORK_SMOOTH_V31' <<<"$SMOOTH" && grep -q 'NEXUS_PARTY_SYNC_V32' <<<"$PARTY" && grep -q 'NEXUS_PIXEL_V32' <<<"$PIXEL" && grep -q "build:'0.32'" <<<"$VERIFY"; then
+            if grep -q 'BUILD 0.33' <<<"$HTML" && grep -q 'NEXUS_NETWORK_V31' <<<"$NETWORK" && grep -q 'NEXUS_NETWORK_SMOOTH_V31' <<<"$SMOOTH" && grep -q 'NEXUS_PARTY_SYNC_V32' <<<"$PARTY" && grep -q 'NEXUS_PIXEL_V32' <<<"$PIXEL" && grep -q "build:'0.32'" <<<"$VERIFY"; then
               READY=1
-              echo "Live build 0.32 is deployed"
+              echo "Live build 0.33 is deployed"
               break
             fi
             echo "Waiting for Pages deployment... ${i}/100"
             sleep 2
           done
           if [ "$READY" -ne 1 ]; then
-            echo 'GitHub Pages did not expose build 0.32 in time'
+            echo 'GitHub Pages did not expose build 0.33 in time'
             exit 1
           fi
       - name: Live GitHub Pages regression test
@@ -140,7 +140,7 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
       - name: Live buildcraft + synergy test
         shell: bash
         run: |
@@ -152,34 +152,34 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v26.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v26.mjs
       - name: Live motion + detail test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v27.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v27.mjs
       - name: Live party pause + 5-player link test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v28.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v28.mjs
       - name: Live unified 5-player transport stress test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31.mjs
       - name: Live low-lag dual-channel 5-player test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31-smooth.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31-smooth.mjs
       - name: Live 4-player level recovery + pixel asset test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.32' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v32.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.33' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v32.mjs
