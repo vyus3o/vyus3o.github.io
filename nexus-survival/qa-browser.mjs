@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer-core';
 
 const base=process.env.NEXUS_QA_URL||'http://127.0.0.1:4173/';
-const expectedBuild=process.env.NEXUS_EXPECTED_BUILD||'0.18';
+const expectedBuild=process.env.NEXUS_EXPECTED_BUILD||'0.19';
 const chrome=process.env.CHROME_BIN||'/usr/bin/google-chrome';
 const browser=await puppeteer.launch({
   headless:true,
@@ -59,7 +59,7 @@ async function population(page){
 }
 
 try{
-  /* 1. Solo horde must actually become visible, not just exist off-screen. */
+  /* Solo spawning: enemies must actually reach the viewport in a growing horde. */
   const soloPack=await openPage('solo');
   const solo=soloPack.page;
   const label=await solo.evaluate(()=>document.querySelector('.brandCorner')?.textContent||'');
@@ -78,7 +78,7 @@ try{
   mark(`solo:PASS total=${soloPop.hostiles} visible=${soloPop.visible} t=${soloPop.time.toFixed(2)}`);
   await solo.close();
 
-  /* 2. Real PeerJS two-player room: host is authoritative and client must receive the same enemies. */
+  /* Real PeerJS two-player room. */
   const hostPack=await openPage('multi-host');
   const clientPack=await openPage('multi-client');
   const host=hostPack.page,client=clientPack.page;
@@ -111,6 +111,50 @@ try{
   if(hostPop.hostiles<7||clientPop.hostiles<5||overlap<5)fail('enemy snapshot sync failed',JSON.stringify({hostPop,clientPop,overlap}));
   mark(`multi:enemy-sync PASS host=${hostPop.hostiles} client=${clientPop.hostiles} overlap=${overlap}`);
 
+  /* Every participant must receive a boss reward, and the client must see its own reward modal. */
+  mark('multi:boss-reward-all-players');
+  await host.evaluate(()=>eval(`(()=>{
+    g.e=[];g.boss=false;g.stage=0;
+    for(const p of Object.values(g.players)){p.skills={W01:1};p.advSkills={};p.pendingLevel=false;}
+    netSnapshotBroadcast(makeNetState());
+  })()`));
+  await client.waitForFunction(()=>eval("localPlayer()?.skills?.W01===1"),{timeout:4000});
+  await host.evaluate(()=>eval('openChest()'));
+  await host.waitForFunction(()=>eval("state==='chest'&&g._v19ChestGranted?.stage===0&&g.players.p1.skills.W01===2&&g.players.p2.skills.W01===2"),{timeout:4000});
+  await client.waitForFunction(()=>eval("state==='chest'&&localPlayer()?.skills?.W01===2&&!document.getElementById('chestModal').classList.contains('hidden')"),{timeout:5000});
+  const rewardState=await Promise.all([
+    host.evaluate(()=>eval("({p1:g.players.p1.skills.W01,p2:g.players.p2.skills.W01,rewards:Object.keys(g._v19ChestGranted.rewards).sort()})")),
+    client.evaluate(()=>eval("({p2:localPlayer().skills.W01,state,shown:!document.getElementById('chestModal').classList.contains('hidden'),text:document.getElementById('reward').textContent})"))
+  ]);
+  if(rewardState[0].p1!==2||rewardState[0].p2!==2||rewardState[0].rewards.join(',')!=='p1,p2'||rewardState[1].p2!==2||!rewardState[1].shown)fail('party boss rewards failed',JSON.stringify(rewardState));
+  mark('multi:boss-reward PASS p1=2 p2=2 client-modal=true');
+
+  /* Host alone advances the stage; the client cannot run host reward logic. */
+  await host.evaluate(()=>document.getElementById('rewardBtn').click());
+  await host.waitForFunction(()=>eval("state==='play'&&g.stage===1"),{timeout:4000});
+  await client.waitForFunction(()=>eval("state==='play'&&g.stage===1&&document.getElementById('chestModal').classList.contains('hidden')"),{timeout:6000});
+
+  /* Dash cooldown must be based on authoritative host time on both peers. */
+  mark('multi:dash-clock-sync');
+  await client.keyboard.press('Space');
+  await host.waitForFunction(()=>eval("(g.players.p2.dashReadyAt||0)>g.t+1"),{timeout:4000});
+  await sleep(350);
+  const dashA=await Promise.all([
+    host.evaluate(()=>eval("({t:g.t,ready:g.players.p2.dashReadyAt,remain:Math.max(0,g.players.p2.dashReadyAt-g.t)})")),
+    client.evaluate(()=>eval("({t:g.t,ready:localPlayer().dashReadyAt,remain:Math.max(0,(localPlayer().dashReadyAt||0)-g.t)})"))
+  ]);
+  if(Math.abs(dashA[0].remain-dashA[1].remain)>.30)fail('dash cooldown clocks diverged',JSON.stringify(dashA));
+  await sleep(700);
+  const dashB=await Promise.all([
+    host.evaluate(()=>eval("Math.max(0,g.players.p2.dashReadyAt-g.t)")),
+    client.evaluate(()=>eval("Math.max(0,(localPlayer().dashReadyAt||0)-g.t)"))
+  ]);
+  if(Math.abs(dashB[0]-dashB[1])>.30||dashB[0]>=dashA[0].remain-.35||dashB[1]>=dashA[1].remain-.35)fail('dash cooldown did not count down consistently',JSON.stringify({dashA,dashB}));
+  await sleep(1800);
+  await host.waitForFunction(()=>eval("(g.players.p2.dashReadyAt||0)<=g.t+.08"),{timeout:3000});
+  await client.waitForFunction(()=>eval("(localPlayer().dashReadyAt||0)<=g.t+.15"),{timeout:3000});
+  mark(`multi:dash-sync PASS initial=${dashA[0].remain.toFixed(2)}/${dashA[1].remain.toFixed(2)} later=${dashB[0].toFixed(2)}/${dashB[1].toFixed(2)}`);
+
   mark('multi:client-input');
   const beforeMove=await host.evaluate(()=>eval('g.players.p2.x'));
   await client.keyboard.down('d');
@@ -128,7 +172,7 @@ try{
   await host.evaluate(()=>eval('netClose()')).catch(()=>{});
   await client.close();await host.close();
 
-  /* 3. Mobile portrait also needs a growing population. */
+  /* Mobile portrait also needs growing population and controls. */
   const mobilePack=await openPage('mobile',true);
   const mobile=mobilePack.page;
   await startSolo(mobile,'mobile');
@@ -150,9 +194,11 @@ try{
   console.log(`PASS browser:build-${expectedBuild} :: ${base}`);
   console.log(`PASS browser:solo-visible-horde :: total ${soloPop.hostiles}, visible ${soloPop.visible}`);
   console.log(`PASS browser:peerjs-2p-enemy-sync :: host ${hostPop.hostiles}, client ${clientPop.hostiles}, overlap ${overlap}`);
+  console.log('PASS browser:peerjs-2p-party-boss-rewards');
+  console.log('PASS browser:peerjs-2p-dash-clock-sync');
   console.log(`PASS browser:peerjs-2p-input :: ${beforeMove.toFixed(1)} -> ${afterMove.toFixed(1)}`);
   console.log(`PASS browser:mobile-spawn :: ${mobileState.hostiles}`);
-  console.log('5/5 focused browser checks passed');
+  console.log('7/7 focused browser checks passed');
 } finally {
   await browser.close().catch(()=>{});
 }
