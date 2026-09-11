@@ -25,15 +25,8 @@ jobs:
           from pathlib import Path
           p=Path('nexus-survival/game-progression-v13.js')
           s=p.read_text(encoding='utf-8')
-          old1=""" }
- const out=oldUpdateHost13(dt);
- if(g&&state==='play'){
-"""
-          new1=""" }
- const beforeNextEnemyId=g?.nextEnemyId||0;
- const out=oldUpdateHost13(dt);
- if(g&&state==='play'){
-"""
+          old1=" }\n const out=oldUpdateHost13(dt);\n if(g&&state==='play'){\n"
+          new1=" }\n const beforeNextEnemyId=g?.nextEnemyId||0;\n const out=oldUpdateHost13(dt);\n if(g&&state==='play'){\n"
           old2="  if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());"
           new2="  if(!g.boss&&g.nextEnemyId>beforeNextEnemyId)g.spawn=Math.max(g.spawn,spawnFloor());"
           if s.count(old1) != 1:
@@ -48,7 +41,7 @@ jobs:
           set -euo pipefail
           node --check nexus-survival/game-progression-v13.js
           grep -F "if(!g.boss&&g.nextEnemyId>beforeNextEnemyId)g.spawn=Math.max(g.spawn,spawnFloor());" nexus-survival/game-progression-v13.js
-          ! grep -F "if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());" nexus-survival/game-progression-v13.js
+          if grep -F "if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());" nexus-survival/game-progression-v13.js; then exit 1; fi
       - name: Commit verified fix
         shell: bash
         run: |
