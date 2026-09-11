@@ -7,8 +7,8 @@ const TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  * Target: every class can comfortably clear STAGE 1 without skills.
  * These multipliers affect BASIC ATTACKS only, preserving late-game active-skill scaling.
  */
-const BASIC_MUL={warrior:1.10,archer:1.04,mage:1.22,priest:1.20,necromancer:1.28,rogue:.80,gunslinger:.73};
-const OPENING_FADE={mage:.08,necromancer:.08,priest:.04};
+const BASIC_MUL={warrior:1.10,archer:1.04,mage:1.14,priest:1.18,necromancer:1.20,rogue:.80,gunslinger:.73};
+const OPENING_FADE={mage:.06,necromancer:.06,priest:.04};
 const DIFF_OPEN={EASY:1,NORMAL:1.18,HARD:1.24,NIGHTMARE:1.30,HELL:1.36};
 function openingDiffMul(){const stage=Math.max(0,g?.stage||0),w=Math.max(0,1-stage/9),target=DIFF_OPEN[typeof diff==='string'?diff:'NORMAL']||1;return 1+(target-1)*w}
 const oldBasic26=doBasicAttack;
@@ -16,7 +16,6 @@ doBasicAttack=function(p,t){
  if(!p||!t)return oldBasic26(p,t);
  const oldDmg=p.dmg,stage=Math.max(0,g?.stage||0),fade=Math.max(0,1-stage/9),mul=(BASIC_MUL[p.cls]||1)*(1+(OPENING_FADE[p.cls]||0)*fade),beforeQ=g?.q?.length||0;
  let restoreAddFx=null;
- /* Rogue used the generic long 'slash' beam. Convert only its basic attack to a dedicated dagger slash. */
  if(p.cls==='rogue'){
   const realAddFx=addFx;restoreAddFx=realAddFx;
   addFx=function(type,x,y,o={}){
@@ -26,7 +25,6 @@ doBasicAttack=function(p,t){
  }
  p.dmg=oldDmg*mul;
  try{oldBasic26(p,t)}finally{p.dmg=oldDmg;if(restoreAddFx)addFx=restoreAddFx}
- /* Innate pre-skill identity to prevent weak opening ranged classes. */
  if(g?.q?.length>beforeQ){
   for(let i=beforeQ;i<g.q.length;i++){
    const q=g.q[i];if(!q||q.ownerId!==p.id)continue;
@@ -55,17 +53,12 @@ const oldDrawPlayer26=drawPlayer;
 drawPlayer=function(p,isLocal=false){
  if(!p)return oldDrawPlayer26(p,isLocal);
  const realArc=ctx.arc;
- /* Remove the always-on circular player ring and circular shield bubble from the legacy renderer.
-    Buff/ultimate aura rings use different radii and remain intact. */
  ctx.arc=function(x,y,r,a0,a1,ccw){if(r===25||r===22||r===31)return;return realArc.call(this,x,y,r,a0,a1,ccw)};
  try{oldDrawPlayer26(p,isLocal)}finally{ctx.arc=realArc}
  const col=playerRingColor(p.id),x=p.x,y=p.y+14,s=isLocal?15:11;
  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=isLocal?2:1.5;ctx.globalAlpha=isLocal?.95:.58;
- /* four corner ticks instead of a full circle */
  for(let i=0;i<4;i++){const sx=i%2?-1:1,sy=i<2?-1:1;ctx.beginPath();ctx.moveTo(x+sx*s,y+sy*6);ctx.lineTo(x+sx*(s-6),y+sy*6);ctx.stroke()}
- if((p.shield||0)>0){
-  ctx.globalAlpha=.82;ctx.strokeStyle='#a8e8ff';ctx.lineWidth=2;const hx=p.x+18,hy=p.y-29,r=7;ctx.beginPath();for(let i=0;i<6;i++){const a=-Math.PI/2+i*TAU/6,xx=hx+Math.cos(a)*r,yy=hy+Math.sin(a)*r;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.closePath();ctx.stroke();
- }
+ if((p.shield||0)>0){ctx.globalAlpha=.82;ctx.strokeStyle='#a8e8ff';ctx.lineWidth=2;const hx=p.x+18,hy=p.y-29,r=7;ctx.beginPath();for(let i=0;i<6;i++){const a=-Math.PI/2+i*TAU/6,xx=hx+Math.cos(a)*r,yy=hy+Math.sin(a)*r;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.closePath();ctx.stroke()}
  ctx.restore();
 };
 
