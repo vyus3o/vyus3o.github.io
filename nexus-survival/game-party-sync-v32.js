@@ -72,8 +72,11 @@ function resumeHost(reason='all-ready'){
  if(NET.mode!=='host'||!hostRound||!g)return false;
  if(pendingHostPlayers().length)return false;
  const rid=hostRound.id;hostRound=null;clearHeartbeat();for(const p of Object.values(g.players||{}))p.pendingLevel=false;clearUi();state='play';
- const snap=typeof makeNetState==='function'?makeNetState():null,pkt={t:'v32LevelResume',round:rid,state:snap,reason,build:BUILD};
- try{netBroadcast(pkt)}catch{};setTimeout(()=>{try{NET.mode==='host'&&netBroadcast(pkt)}catch{}},120);setTimeout(()=>{try{NET.mode==='host'&&netBroadcast(pkt)}catch{}},420);
+ const snap=typeof makeNetState==='function'?makeNetState():null;
+ const legacy={t:'v28LevelResume',state:snap,reason:`v32-${reason}`,build:BUILD};
+ const pkt={t:'v32LevelResume',round:rid,state:snap,reason,build:BUILD};
+ const sendResume=()=>{try{netBroadcast(legacy);netBroadcast(pkt)}catch{}};
+ sendResume();setTimeout(()=>{if(NET.mode==='host')sendResume()},120);setTimeout(()=>{if(NET.mode==='host')sendResume()},420);
  if(typeof toast==='function')toast('PARTY READY // 전투 재개');return true;
 }
 function requestMissing(round){
@@ -132,6 +135,14 @@ netHostMessage=function(conn,msg){
  return out;
 };
 
+/* Keep direct internal choice paths compatible with the newer reliable round. */
+const prevApplyRemoteChoice32=netApplyRemoteChoice;
+netApplyRemoteChoice=function(pid,o){
+ const out=prevApplyRemoteChoice32(pid,o);
+ if(NET.mode==='host'&&hostRound){sendRound();resumeHost('remote-choice')}
+ return out;
+};
+
 const prevSendChoice32=netSendChoice;
 netSendChoice=function(choice){
  if(NET.mode==='client'&&clientRound&&NET.hostConn?.open){const p=local(),token=`v32:${clientRound.id}:${NET.localId}:${p?.l||0}`;try{NET.hostConn.send({t:'choice',choice,choiceToken:token,levelRound:clientRound.id,build:BUILD});return}catch{}}
@@ -145,5 +156,5 @@ const nx=nexus();if(nx&&!nx.dataset.v32){nx.dataset.v32='1';const old=nx.onclick
 const prevNetClose32=netClose;
 netClose=function(){clearHeartbeat();hostRound=clientRound=null;submitted.clear();acked.clear();clearUi();return prevNetClose32()};
 
-window.NEXUS_PARTY_SYNC_V32={build:BUILD,reliableLevelRounds:true,repeatedChoiceDelivery:true,missingChoiceResync:true,allPlayerPause:true,duplicateSafe:true,get hostRound(){return hostRound},get clientRound(){return clientRound},forceRoundSync:()=>sendRound(),resumeHost};
+window.NEXUS_PARTY_SYNC_V32={build:BUILD,reliableLevelRounds:true,repeatedChoiceDelivery:true,missingChoiceResync:true,allPlayerPause:true,duplicateSafe:true,legacyResumeCompatibility:true,get hostRound(){return hostRound},get clientRound(){return clientRound},forceRoundSync:()=>sendRound(),resumeHost};
 })();
