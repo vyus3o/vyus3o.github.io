@@ -28,11 +28,14 @@ check('polish:hud',polish.includes('hudNoOverlap:true'));
 check('motion:player-enemy-boss',motion.includes('playerMotion:true')&&motion.includes('enemyGait:true')&&motion.includes('bossPhaseMotion:true'));
 check('party:5p-native',party.includes('MAX_PLAYERS=5')&&party.includes("['p2','p3','p4','p5']"));
 check('party:global-level-pause',party.includes('waitForAllLevelChoices:true')&&party.includes('freezeTimers:true'));
-check('network:turn-public',network.includes("turn:openrelay.metered.ca:80")&&network.includes("turn:openrelay.metered.ca:443?transport=tcp")&&network.includes("username:'openrelayproject'")&&network.includes("credential:'openrelayproject'"));
-check('network:relay-probe',network.includes('testTurnCandidate29')&&network.includes("iceTransportPolicy:'relay'")&&network.includes("typ relay"));
+check('network:p2p-primary',network.includes('p2pPrimary:true')&&network.includes('stun:stun.l.google.com:19302'));
+check('network:web-relay',network.includes('webRelayFallback:true')&&network.includes('broker.emqx.io:8084/mqtt')&&network.includes('test.mosquitto.org:8081/mqtt')&&network.includes('MQTT_CDN'));
+check('network:relay-probe',network.includes('testWsRelay29')&&network.includes('mqtt websocket roundtrip'));
 check('network:5p-preserved',network.includes('MAX_PLAYERS=5')&&network.includes('netAccept=function')&&network.includes('joinAttempts:5'));
+check('network:client-dedupe',network.includes('clientKey')&&network.includes('clientIdentity'));
 check('stability:nexus-lock',network.includes('singleChoice:true')&&network.includes('nexusLock:true')&&network.includes('lockChoice'));
 check('stability:duplicate-choice',network.includes('duplicateChoiceGuard:true')&&network.includes('processedChoices'));
-check('stability:pause-recovery',network.includes('disconnectPauseRecovery:true')&&network.includes('forceResumeIfReady')&&verify.includes('__NEXUS_PARTY_GUARD29'));
+check('stability:pause-recovery',network.includes('disconnectPauseRecovery:true')&&network.includes('forceResumeIfReady')&&network.includes('lifetimeGuard'));
 check('stability:multi-replay',network.includes('multiReplayCleanup:true')&&network.includes('hardSessionCleanup')&&network.includes('sessionGeneration'));
+check('verify:web-relay',verify.includes('webRelayFallback')&&verify.includes('webRelayBrokers'));
 const failed=results.filter(x=>!x.ok);for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);console.log(`\n${results.length-failed.length}/${results.length} checks passed`);if(failed.length){console.error('FAILED:',failed.map(x=>x.name).join(', '));process.exit(1)}
