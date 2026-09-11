@@ -11,7 +11,7 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-spawn-v18.js','game-verify-v16.js'
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-verify-v16.js','game-verify-v19.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
 
@@ -20,13 +20,15 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
+const verify19=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
+const multiFix=read('game-multiplayer-v19.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.18',index.includes('BUILD 0.18')&&index.includes('PROTOCOL // 18'));
-check('cache:v18',/game-spawn-v18\.js\?v=18/.test(index)&&/game-progression-v13\.js\?v=18/.test(index)&&/game-multi\.js\?v=18/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v16.js')>index.lastIndexOf('game-spawn-v18.js'));
+check('build:0.19',index.includes('BUILD 0.19')&&index.includes('PROTOCOL // 19'));
+check('cache:v19',/game-multiplayer-v19\.js\?v=19/.test(index)&&/game-progression-v13\.js\?v=19/.test(index)&&/game-multi\.js\?v=19/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-multiplayer-v19.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -51,9 +53,14 @@ check('progression:spawn-timer-floor',progression.includes('g.nextEnemyId>before
 
 check('spawn:visible-edge',spawnFix.includes('randEdgeSpawn=function()')&&spawnFix.includes('halfW=W/2+mx')&&spawnFix.includes('halfH=H/2+my'));
 check('spawn:watchdog',spawnFix.includes('minPopulation')&&spawnFix.includes('g.t-g._spawnWatchAt>1.25')&&spawnFix.includes('spawn(false)'));
+check('multi:all-boss-rewards',multiFix.includes("NET.mode!=='host'")&&multiFix.includes("for(const [pid,r] of Object.entries(rewards))")&&multiFix.includes("t:'v19Chest'"));
+check('multi:client-chest',multiFix.includes("state='chest'")&&multiFix.includes('REWARD RECEIVED // 방장 대기'));
+check('multi:no-double-reward',multiFix.includes('g.pendingChestRewards={}'));
+check('multi:dash-host-clock',multiFix.includes('d.dashReadyAt=')&&multiFix.includes('d.dashInvulUntil='));
+check('multi:fix-marker',multiFix.includes("build:'0.19'")&&multiFix.includes('partyBossRewards:true')&&multiFix.includes('dashClockSync:true'));
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa',verify.includes('window.NEXUS_RUN_QA=qa')&&verify.includes("build:'0.18'")&&verify.includes('spawnFix18'));
+check('runtime:self-qa-19',verify19.includes("build:'0.19'")&&verify19.includes('multiplayerRewardFix')&&verify19.includes('dashClockSync'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
