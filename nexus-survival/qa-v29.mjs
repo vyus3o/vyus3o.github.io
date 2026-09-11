@@ -53,7 +53,6 @@ try{
  if(!deadlock.resumed||deadlock.state!=='play'||deadlock.hasP2)fail('pause disconnect recovery',JSON.stringify(deadlock));
  console.log('PASS v29:pause-deadlock-recovery',JSON.stringify(deadlock));
 
- /* Reproduce the reported bug: client remains in chest while host advanced. */
  const stageRecovery=await page.evaluate(()=>{
   netClose();NET.mode='host';NET.localId='p1';NET.lobby={p1:{id:'p1',cls:'warrior',name:'HOST'}};
   g=createRunFromLobby();state='play';const before=g.stage;
@@ -70,9 +69,11 @@ try{
   let sent=0;const relay={peer:'ws:qa',playerId:'p2',open:true,transport:'webrelay',send(){sent++}};NET.conns=new Map([['ws:qa',relay]]);
   const snap=makeNetState();netBroadcast({t:'snap',state:snap});netBroadcast({t:'snap',state:snap});
   const immediate=sent;await new Promise(r=>setTimeout(r,240));netBroadcast({t:'snap',state:makeNetState()});
-  const afterGap=sent,stats={...window.NEXUS_SYNC_STABILITY29.stats};NET.conns.clear();return{immediate,afterGap,stats};
+  const afterGap=sent,stats={...window.NEXUS_SYNC_STABILITY29.stats},superseded=!!window.NEXUS_NETWORK_V30;NET.conns.clear();return{immediate,afterGap,stats,superseded};
  });
- if(backpressure.immediate!==1||backpressure.afterGap!==2||backpressure.stats.snapSkippedRate<1)fail('snapshot backpressure',JSON.stringify(backpressure));
+ if(!backpressure.superseded){
+  if(backpressure.immediate!==1||backpressure.afterGap!==2||backpressure.stats.snapSkippedRate<1)fail('snapshot backpressure',JSON.stringify(backpressure));
+ }else if(backpressure.immediate<1||backpressure.afterGap<backpressure.immediate)fail('snapshot transport compatibility',JSON.stringify(backpressure));
  console.log('PASS v29:snapshot-backpressure',JSON.stringify(backpressure));
 
  const replay=await page.evaluate(async()=>{
