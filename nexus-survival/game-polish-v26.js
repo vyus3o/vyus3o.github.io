@@ -9,6 +9,8 @@ const TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  */
 const BASIC_MUL={warrior:1.10,archer:1.04,mage:1.22,priest:1.20,necromancer:1.28,rogue:.80,gunslinger:.73};
 const OPENING_FADE={mage:.08,necromancer:.08,priest:.04};
+const DIFF_OPEN={EASY:1,NORMAL:1.18,HARD:1.24,NIGHTMARE:1.30,HELL:1.36};
+function openingDiffMul(){const stage=Math.max(0,g?.stage||0),w=Math.max(0,1-stage/9),target=DIFF_OPEN[typeof diff==='string'?diff:'NORMAL']||1;return 1+(target-1)*w}
 const oldBasic26=doBasicAttack;
 doBasicAttack=function(p,t){
  if(!p||!t)return oldBasic26(p,t);
@@ -32,6 +34,19 @@ doBasicAttack=function(p,t){
    if(p.cls==='necromancer'&&q.skill==='N-BASIC')q.pierce=Math.max(q.pierce||0,1);
   }
  }
+};
+
+/* NORMAL+ gets an opening combat assist on all player damage, fading out by STAGE 10.
+   EASY is unchanged. This helps the doubled horde without inflating mid/late-game builds. */
+const oldDamageEnemy26=damageEnemy;
+damageEnemy=function(e,amount,ownerId,o={}){
+ const p=typeof playerById==='function'?playerById(ownerId):null,assist=p?openingDiffMul():1;
+ const out=oldDamageEnemy26(e,amount*assist,ownerId,o);
+ if(e&&p&&g&&((e._hitFx26||0)<=g.t)){
+  e._hitFx26=g.t+.09;const map={warrior:['#e6c59d','spark'],archer:['#cce89b','spark'],mage:['#9eb5ff','spark'],priest:['#fff0a0','cross'],necromancer:['#b59ad8','spark'],rogue:['#a7e2c2','x'],gunslinger:['#f2b36b','spark']},v=map[p.cls]||['#fff','spark'];
+  addFx('hit26',e.x,e.y,{r:p.cls==='rogue'?13:11,col:v[0],life:.13,net:false});const fx=g.fx[g.fx.length-1];if(fx)fx.style=v[1];
+ }
+ return out;
 };
 
 /* ---------- player marker cleanup ---------- */
@@ -98,15 +113,6 @@ drawFx=function(f){
  }
  return oldDrawFx26(f);
 };
-const oldDamageEnemy26=damageEnemy;
-damageEnemy=function(e,amount,ownerId,o={}){
- const out=oldDamageEnemy26(e,amount,ownerId,o),p=typeof playerById==='function'?playerById(ownerId):null;
- if(e&&p&&g&&((e._hitFx26||0)<=g.t)){
-  e._hitFx26=g.t+.09;const map={warrior:['#e6c59d','spark'],archer:['#cce89b','spark'],mage:['#9eb5ff','spark'],priest:['#fff0a0','cross'],necromancer:['#b59ad8','spark'],rogue:['#a7e2c2','x'],gunslinger:['#f2b36b','spark']},v=map[p.cls]||['#fff','spark'];
-  addFx('hit26',e.x,e.y,{r:p.cls==='rogue'?13:11,col:v[0],life:.13,net:false});const fx=g.fx[g.fx.length-1];if(fx)fx.style=v[1];
- }
- return out;
-};
 
-window.NEXUS_POLISH_V26={build:'0.26',openingBalance:true,playerMarker:'cornerTicks',shieldIndicator:'hex',hudNoOverlap:true,rogueFxFixed:true,classBasicVfx:true,basicMultipliers:BASIC_MUL};
+window.NEXUS_POLISH_V26={build:'0.26',openingBalance:true,difficultyOpeningAssist:true,openingDifficulty:DIFF_OPEN,playerMarker:'cornerTicks',shieldIndicator:'hex',hudNoOverlap:true,rogueFxFixed:true,classBasicVfx:true,basicMultipliers:BASIC_MUL};
 })();
