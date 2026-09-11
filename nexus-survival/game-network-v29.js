@@ -27,7 +27,6 @@ async function routeOf(conn){
 }
 function connectionCount(){return Object.keys(NET.lobby||{}).length}
 
-/* Re-create host with TURN-capable RTCConfiguration. game-party-v28 keeps slot admission. */
 netCreateHost=function(){
  if(typeof Peer==='undefined'){setText('hostStatus','PeerJS 로드 실패');return}
  const create=(attempt=0)=>{
@@ -51,13 +50,14 @@ netCreateHost=function(){
  create();
 };
 
-/* TURN is available from the first attempt, so restricted NATs can relay instead of timing out. */
 netJoin=function(code){
  code=String(code||'').trim().toUpperCase();if(!code)return;
  netClose();NET.mode='client';NET.roomCode=code;const generation=++joinGeneration;stopTimer();
  setText('joinStatus','연결 준비 중 · DIRECT/TURN 자동 선택');
  if(typeof Peer==='undefined'){setText('joinStatus','PeerJS 로드 실패');return}
- let peer=makePeer();NET.peer=peer,welcome=false,retrying=false;
+ let peer=makePeer();
+ let welcome=false,retrying=false;
+ NET.peer=peer;
  const retry=(attempt,why)=>{
   if(welcome||generation!==joinGeneration||retrying)return;retrying=true;stopTimer();
   try{NET.hostConn?.close()}catch{};
@@ -89,7 +89,6 @@ netJoin=function(code){
  peer.on('error',err=>{if(!welcome&&err?.type!=='peer-unavailable')setText('joinStatus','접속 오류 · '+(err?.type||'unknown'))});
 };
 
-/* Improve host status after lobby broadcasts without changing gameplay/network authority. */
 const prevLobby29=netBroadcastLobby;
 netBroadcastLobby=function(){const out=prevLobby29();if(NET.mode==='host'&&NET.ready)setText('hostStatus',`방 생성 완료 · ${connectionCount()}/${MAX_PLAYERS} 연결됨 · TURN fallback`);return out};
 
