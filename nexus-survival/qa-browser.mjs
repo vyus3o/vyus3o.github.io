@@ -47,6 +47,11 @@ try{
   const started=await page.evaluate(()=>eval("({stage:g.stage,players:Object.keys(g.players).length,alive:localPlayer().alive})"));
   if(started.stage!==0||started.players<1||!started.alive)fail('solo start failed',JSON.stringify(started));
 
+  // Regression guard: the old spawn-floor bug produced exactly one monster forever.
+  await page.waitForFunction(()=>eval("g&&state==='play'&&g.e.length>=3&&g.nextEnemyId>=4"),{timeout:5000});
+  const population=await page.evaluate(()=>eval("({hostiles:g.e.length,nextEnemyId:g.nextEnemyId,spawn:g.spawn,time:g.t,boss:g.boss})"));
+  if(population.hostiles<3||population.nextEnemyId<4||population.boss)fail('monster population did not grow',JSON.stringify(population));
+
   // Stage 10 advancement: force only the milestone entry, not 9 stages of combat.
   await page.evaluate(()=>eval("g.stage=9;g.t=10;g.e=[];g.boss=false;state='play';openChest();"));
   await page.waitForSelector('#advancementModal:not(.hidden) .advanceCard',{timeout:3000});
@@ -92,11 +97,12 @@ try{
 
   console.log('PASS browser:runtime-qa');
   console.log('PASS browser:solo-start');
+  console.log(`PASS browser:monster-population · ${population.hostiles} hostiles by ${population.time.toFixed(2)}s`);
   console.log(`PASS browser:stage10-advancement · ${afterAdv.subclass}`);
   console.log('PASS browser:stage30-awakening-and-R');
   console.log('PASS browser:stage50-victory');
   console.log('PASS browser:mobile-portrait-controls');
-  console.log('6/6 browser smoke checks passed');
+  console.log('7/7 browser smoke checks passed');
 } finally {
   await browser.close();
 }
