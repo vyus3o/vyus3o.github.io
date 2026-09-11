@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
 const base=process.env.NEXUS_QA_URL||'http://127.0.0.1:4173/';
+const expected=process.env.NEXUS_EXPECTED_BUILD||'0.26';
 const chrome=process.env.CHROME_BIN||'/usr/bin/google-chrome';
 const browser=await puppeteer.launch({headless:true,executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage','--disable-background-timer-throttling','--disable-renderer-backgrounding']});
 const page=await browser.newPage();
@@ -8,7 +9,7 @@ const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console'
 const fail=(m,d='')=>{throw new Error(`${m}${d?` :: ${d}`:''}`)};
 try{
  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
- await page.waitForFunction(()=>window.NEXUS_RUNTIME_CHECK?.build==='0.26',{timeout:12000});
+ await page.waitForFunction(b=>window.NEXUS_RUNTIME_CHECK?.build===b,{timeout:12000},expected);
  const runtime=await page.evaluate(()=>window.NEXUS_RUNTIME_CHECK);if(!runtime.ok)fail('runtime QA',JSON.stringify(runtime.failed));
  const dps=await page.evaluate(()=>eval(`(()=>{const classes=['warrior','archer','mage','priest','necromancer','rogue','gunslinger'],out={};for(const c of classes){cls=c;diff='NORMAL';g=createRunFromLobby();state='play';g.stage=0;const p=localPlayer();p.skills={};p.advSkills={};p.crit=0;p.x=1200;p.y=900;const e={id:999,x:1280,y:900,r:18,hp:99999,max:99999,spd:0,dmg:0,boss:false,dead:false,cd:99,type:0,anim:0,slow:1,slowUntil:0,dotTick:99,markedUntil:0,poison:0,poisonUntil:0,burn:0,burnUntil:0,targetPlayer:null};g.e=[e];g.q=[];g.fx=[];g.text=[];const h=e.hp;doBasicAttack(p,e);for(let i=0;i<30;i++)updateProjectiles(1/60);out[c]={dealt:h-e.hp,rate:p.at,dps:(h-e.hp)/Math.max(.01,p.at),fx:g.fx.map(x=>x.type)};}return out})()`));
  const vals=Object.values(dps).map(x=>x.dps),min=Math.min(...vals),max=Math.max(...vals);if(min<68||max/min>1.42)fail('class opening DPS spread',JSON.stringify(dps));
