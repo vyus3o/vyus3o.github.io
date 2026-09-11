@@ -1,16 +1,9 @@
-/* NEXUS SURVIVAL final runtime QA + 50-stage continuity fixes build 0.16 */
+/* NEXUS SURVIVAL final runtime QA + 50-stage continuity fixes build 0.18 */
 (function(){
 'use strict';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-/* --------------------------------------------------------------------------
- * 1) Stage transition hygiene
- * All time stamps below use stage-local g.t. Because g.t resets to 0 whenever
- * a stage advances, any uncleared absolute timestamp can accidentally last
- * tens of seconds into the next stage. Cooldowns are already converted to
- * remaining time by game-balance-fix-v13.js; only temporary effects are reset.
- * -------------------------------------------------------------------------- */
 const TRANSIENT_ZERO=[
   '_berserkUltUntil','_bloodlustUntil','_huntUntil','_dashBoostUntil',
   '_hawkUntil','_elementalUntil','_elemUltUntil','_rangerUltUntil',
@@ -49,14 +42,6 @@ if(typeof advanceStage==='function'){
   };
 }
 
-/* --------------------------------------------------------------------------
- * 2) Elite probability normalization for all 50 stages
- * Legacy elite-v9 had explicit base values only for the first 5 stage indexes,
- * then fell back to 6%. A later biome bonus partially compensated for it.
- * This final wrapper only promotes enemies that are still normal, bringing the
- * total probability up to a monotonic 50-stage target without double-scaling
- * elites already created by earlier wrappers.
- * -------------------------------------------------------------------------- */
 const DIFF_ELITE={EASY:-.01,NORMAL:0,HARD:.01,NIGHTMARE:.02,HELL:.03};
 function legacyEliteProbability(stageIndex,difficulty){
   const first=[.06,.075,.09,.105,.12];
@@ -93,12 +78,6 @@ if(typeof spawn==='function'){
   };
 }
 
-/* --------------------------------------------------------------------------
- * 3) Non-destructive runtime QA
- * Checks the actual loaded build graph and progression data without altering a
- * live run. The report is available as window.NEXUS_RUNTIME_CHECK and can be
- * re-run with window.NEXUS_RUN_QA().
- * -------------------------------------------------------------------------- */
 function qa(){
   const adv=window.NEXUS_ADV||{};
   const advList=Object.values(adv);
@@ -157,16 +136,17 @@ function qa(){
     maxBuildFallback:choiceMax,
     transientCleanup,
     eliteCurve50:eliteCurve,
+    spawnFix18:window.NEXUS_SPAWN_FIX?.build==='0.18'&&window.NEXUS_SPAWN_FIX?.visibleEdgeSpawn===true&&window.NEXUS_SPAWN_FIX?.watchdog===true,
     multiplayer:typeof netBroadcast==='function'&&typeof netHostMessage==='function'&&typeof netClientMessage==='function',
     combat:typeof updateHost==='function'&&typeof updatePlayers==='function'&&typeof damageEnemy==='function'&&typeof openChest==='function',
     dash:typeof updateClient==='function'&&typeof damagePlayer==='function',
     mobilePortrait:document.querySelector('meta[name="screen-orientation"]')?.content==='portrait'
   };
   const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);
-  const report={build:'0.16',ok:failed.length===0,checks,failed,advancedClasses:advList.length,advancedSkills:skillCount,stages:ST?.length||0,at:Date.now()};
+  const report={build:'0.18',ok:failed.length===0,checks,failed,advancedClasses:advList.length,advancedSkills:skillCount,stages:ST?.length||0,at:Date.now()};
   window.NEXUS_RUNTIME_CHECK=report;
-  if(report.ok)console.info('[NEXUS 0.16] QA PASS',report);
-  else console.error('[NEXUS 0.16] QA FAIL',report);
+  if(report.ok)console.info('[NEXUS 0.18] QA PASS',report);
+  else console.error('[NEXUS 0.18] QA FAIL',report);
   return report;
 }
 window.NEXUS_RUN_QA=qa;
