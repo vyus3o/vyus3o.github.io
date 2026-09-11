@@ -1,4 +1,4 @@
-/* NEXUS SURVIVAL mobile UI + seamless class dash build 0.12 */
+/* NEXUS SURVIVAL mobile UI + seamless class dash build 0.12 / multiplayer hotfix 0.19 */
 (function(){
 'use strict';
 const IS_MOBILE=matchMedia('(pointer:coarse)').matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -114,5 +114,7 @@ function uiTick(){
   requestAnimationFrame(uiTick);
 }
 function boot(){installHooks();patchHud();patchMinimap();syncViewport();replaceDashButton();requestAnimationFrame(uiTick);window.addEventListener('resize',syncViewport,{passive:true});window.visualViewport?.addEventListener('resize',syncViewport,{passive:true});window.visualViewport?.addEventListener('scroll',syncViewport,{passive:true});}
-if(document.readyState==='complete')boot();else window.addEventListener('load',boot,{once:true});
+/* Install input/network hooks immediately. Waiting for window.load left a short legacy-dash race on slower clients. */
+boot();
+if(document.readyState!=='complete')window.addEventListener('load',syncViewport,{once:true});
 })();
