@@ -24,7 +24,7 @@ const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
 check('build:0.16',index.includes('BUILD 0.16')&&index.includes('PROTOCOL // 16'));
-check('cache:v16',/game-verify-v16\.js\?v=16/.test(index)&&/game-progression-v13\.js\?v=16/.test(index));
+check('cache:spawn-hotfix-v17',/game-verify-v16\.js\?v=16/.test(index)&&/game-progression-v13\.js\?v=17/.test(index));
 check('verify:last-script',index.lastIndexOf('game-verify-v16.js')>index.lastIndexOf('game-runtime-fix-v14.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
@@ -46,6 +46,7 @@ check('progression:stage50-end',progression.includes("if(s===50){endGame"));
 check('progression:max-fallback',progression.includes("type:'endless'")&&progression.includes('MAX BUILD BONUS'));
 check('progression:R-input',progression.includes("e.code==='KeyR'")&&progression.includes("t:'v13Ult'"));
 check('progression:multiplayer-resume',progression.includes("t:'v13Resume'"));
+check('progression:spawn-timer-floor',progression.includes('const beforeNextEnemyId=g?.nextEnemyId||0;')&&progression.includes('g.nextEnemyId>beforeNextEnemyId')&&!progression.includes("if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());"));
 
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
