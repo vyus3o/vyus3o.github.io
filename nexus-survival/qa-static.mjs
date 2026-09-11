@@ -11,7 +11,7 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js',
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js',
   'game-verify-v16.js','game-verify-v19.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
@@ -21,16 +21,17 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
-const verify20=read('game-verify-v19.js');
+const verify21=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
 const multiFix=read('game-multiplayer-v19.js');
 const visual20=read('game-visual-v20.js');
+const swarm21=read('game-swarm-v21.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.20',index.includes('BUILD 0.20')&&index.includes('PROTOCOL // 20'));
-check('cache:v20',/game-visual-v20\.js\?v=20/.test(index)&&/game-multiplayer-v19\.js\?v=20/.test(index)&&/game-progression-v13\.js\?v=20/.test(index)&&/game-multi\.js\?v=20/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-visual-v20.js'));
+check('build:0.21',index.includes('BUILD 0.21')&&index.includes('PROTOCOL // 21'));
+check('cache:v21',/game-swarm-v21\.js\?v=21/.test(index)&&/game-verify-v19\.js\?v=21/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-swarm-v21.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -68,9 +69,18 @@ check('visual:skill-vfx',visual20.includes('drawFx=function')&&visual20.includes
 check('visual:zone-vfx',visual20.includes("k==='blackhole'")&&visual20.includes("k==='arrowrain'")&&visual20.includes("k==='sanctuary'"));
 check('visual:ultimate-aura',visual20.includes("p.subclass==='berserker'")&&visual20.includes("p.subclass==='guardian'")&&visual20.includes("p.subclass==='elementalist'"));
 
+check('swarm:v21-marker',swarm21.includes("build:'0.21'")&&swarm21.includes('spawnMultiplier:2'));
+check('swarm:2x-batch',swarm21.includes('for(let i=0;i<2;i++')&&swarm21.includes('oldSpawn21(false)'));
+check('swarm:5-grades',['common','uncommon','rare','epic','legendary'].every(x=>swarm21.includes(`${x}:{name:`)));
+check('swarm:3-roles',['swift','brute','hunter'].every(x=>swarm21.includes(`${x}:{name:`)));
+check('swarm:grade-xp',swarm21.includes('gradeXp=')&&swarm21.includes("g.gem[i].v=Math.max(1,Math.round"));
+check('swarm:grade-colors',swarm21.includes("'#7ed36e'")&&swarm21.includes("'#62b9ff'")&&swarm21.includes("'#c47cff'")&&swarm21.includes("'#ffbd55'"));
+check('swarm:network-sync',swarm21.includes('d.grade=e.grade')&&swarm21.includes('e.grade=d.grade'));
+check('swarm:faster-entry',swarm21.includes('const mx=26+Math.random()*42')&&swarm21.includes('const my=22+Math.random()*38'));
+
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa-20',verify20.includes("build:'0.20'")&&verify20.includes('visualBuild')&&verify20.includes('monsterVisuals')&&verify20.includes('bossVisuals'));
+check('runtime:self-qa-21',verify21.includes("build:'0.21'")&&verify21.includes('doubleSpawn')&&verify21.includes('monsterGrades')&&verify21.includes('gradeNetworkSync'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
