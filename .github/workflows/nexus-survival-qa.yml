@@ -73,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          sed -i "s/window.NEXUS_RUNTIME_CHECK?.build==='0\.25'/window.NEXUS_RUNTIME_CHECK?.build==='0.32'/" nexus-survival/qa-v25.mjs
+          sed -i "s/window.NEXUS_RUNTIME_CHECK?.build==='0\.25'/window.NEXUS_RUNTIME_CHECK?.build==='0.33'/" nexus-survival/qa-v25.mjs
           CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v25.mjs
       - name: Local opening balance + HUD VFX QA
         shell: bash
@@ -122,8 +122,8 @@ jobs:
             SMOOTH="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-network-smooth-v31.js?v=3112&qa=${GITHUB_SHA}-${i}" || true)"
             PARTY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-party-sync-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
             PIXEL="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-pixel-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
-            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v32.js?v=3201&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.33' <<<"$HTML" && grep -q 'NEXUS_NETWORK_V31' <<<"$NETWORK" && grep -q 'NEXUS_NETWORK_SMOOTH_V31' <<<"$SMOOTH" && grep -q 'NEXUS_PARTY_SYNC_V32' <<<"$PARTY" && grep -q 'NEXUS_PIXEL_V32' <<<"$PIXEL" && grep -q "build:'0.32'" <<<"$VERIFY"; then
+            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v32.js?v=3301&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.33' <<<"$HTML" && grep -q 'NEXUS_NETWORK_V31' <<<"$NETWORK" && grep -q 'NEXUS_NETWORK_SMOOTH_V31' <<<"$SMOOTH" && grep -q 'NEXUS_PARTY_SYNC_V32' <<<"$PARTY" && grep -q 'NEXUS_PIXEL_V32' <<<"$PIXEL" && grep -q "build:'0.33'" <<<"$VERIFY"; then
               READY=1
               echo "Live build 0.33 is deployed"
               break
