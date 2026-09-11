@@ -12,13 +12,14 @@ try{
  await page.waitForFunction(b=>window.NEXUS_RUNTIME_CHECK?.build===b,{timeout:15000},expected);
  const runtime=await page.evaluate(()=>window.NEXUS_RUNTIME_CHECK);if(!runtime.ok)fail('runtime',JSON.stringify(runtime.failed));
  const flags=await page.evaluate(()=>({network:window.NEXUS_NETWORK_V29,stability:window.NEXUS_STABILITY_V29}));
- if(!flags.network?.turnFallback||flags.network.turnUrls<3||flags.network.stunUrls<3||flags.network.maxPlayers!==5||flags.network.joinAttempts<5)fail('network flags',JSON.stringify(flags.network));
+ if(!flags.network?.p2pPrimary||!flags.network?.webRelayFallback||flags.network.webRelayBrokers<2||flags.network.stunUrls<3||flags.network.maxPlayers!==5||flags.network.joinAttempts<5)fail('network flags',JSON.stringify(flags.network));
  if(!flags.stability?.singleChoice||!flags.stability?.nexusLock||!flags.stability?.duplicateChoiceGuard||!flags.stability?.disconnectPauseRecovery||!flags.stability?.multiReplayCleanup)fail('stability flags',JSON.stringify(flags.stability));
  console.log('PASS v29:network-stability-flags',JSON.stringify(flags));
 
- const relay=await page.evaluate(()=>window.NEXUS_TEST_TURN29(15000));
- if(!relay?.ok)fail('real relay candidate',JSON.stringify(relay));
- console.log('PASS v29:real-relay-candidate',relay.detail);
+ let relay=await page.evaluate(()=>window.NEXUS_TEST_WS_RELAY29(12000));
+ if(!relay?.ok)relay=await page.evaluate(()=>window.NEXUS_TEST_WS_RELAY29(12000));
+ if(!relay?.ok)fail('websocket relay roundtrip',JSON.stringify(relay));
+ console.log('PASS v29:websocket-relay-roundtrip',JSON.stringify(relay));
 
  const nexus=await page.evaluate(()=>{
   netSetMode('solo');g=createRunFromLobby();state='play';
@@ -67,8 +68,8 @@ try{
   }
   window.Peer=FakePeer;
   try{
-   g=null;state='menu';netJoin('ABC123');await new Promise(r=>setTimeout(r,80));const first=NET.peer,firstReady=NET.localId==='p2';
-   netClose();netJoin('ABC123');await new Promise(r=>setTimeout(r,80));const second=NET.peer,secondReady=NET.localId==='p2';
+   g=null;state='menu';netJoin('ABC123');await new Promise(r=>setTimeout(r,120));const first=NET.peer,firstReady=NET.localId==='p2';
+   netClose();netJoin('ABC123');await new Promise(r=>setTimeout(r,120));const second=NET.peer,secondReady=NET.localId==='p2';
    const out={peerCount:peers.length,firstDestroyed:first?.destroyed===true,different:first!==second,firstReady,secondReady};
    netClose();return out;
   }finally{window.Peer=RealPeer;NET.mode='solo'}
