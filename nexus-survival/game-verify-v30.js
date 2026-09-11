@@ -2,10 +2,13 @@
 (function(){
 'use strict';
 function qa30(){
- const n=window.NEXUS_NETWORK_V30||{},p=window.NEXUS_PARTY_V28||{},m=window.NEXUS_MOTION_V27||{},bc=window.NEXUS_BUILDCRAFT_V25||{},ex=window.NEXUS_EXPANSION_V24||{};
+ const n=window.NEXUS_NETWORK_V30||{},n29=window.NEXUS_NETWORK_V29||{},s29=window.NEXUS_STABILITY_V29||{},sync29=window.NEXUS_SYNC_STABILITY29||{},p=window.NEXUS_PARTY_V28||{},m=window.NEXUS_MOTION_V27||{},bc=window.NEXUS_BUILDCRAFT_V25||{},ex=window.NEXUS_EXPANSION_V24||{};
  const checks={
-  network30:n.build==='0.30'&&n.authenticatedTurn===true&&n.timeLimitedCredentials===true&&n.relayProbe===true,
-  turnHost:n.turnHost==='staticauth.openrelay.metered.ca'&&n.turnUrls>=4,
+  compact30:n.build==='0.30'&&n.compactSnapshots===true&&n.interestManagement===true&&n.latestStateWins===true,
+  smooth30:n.snapshotBackpressure===true&&n.clientExtrapolation===true&&n.separateVisualStream===true,
+  payloadCaps:n.directEnemyCap>=100&&n.relayEnemyCap>=60&&n.relayEnemyCap<n.directEnemyCap&&n.bufferHard>n.bufferSoft,
+  fallback29:n29.p2pPrimary===true&&n29.webRelayFallback===true&&n29.maxPlayers===5,
+  stability29:s29.singleChoice===true&&s29.nexusLock===true&&s29.disconnectPauseRecovery===true&&sync29.staleStateRecovery===true,
   fivePlayer:n.maxPlayers===5&&p.maxPlayers===5&&ex.maxPlayers===5,
   partyPause:p.globalLevelPause===true&&p.waitForAllLevelChoices===true,
   motion:m.build==='0.27'&&m.playerMotion===true&&m.enemyGait===true,
