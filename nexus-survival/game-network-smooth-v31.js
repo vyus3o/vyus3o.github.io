@@ -7,13 +7,12 @@
 (function(){
 'use strict';
 
-const HOTFIX='0.31-smooth.1';
+const HOTFIX='0.31-smooth.2';
 const STATE_LABEL='nexus-state-v31-smooth';
 const STATE_META='state31smooth';
 const STATE_BUFFER_DROP=64*1024;
 const FALLBACK_BUFFER_DROP=112*1024;
 const INTEREST_RADIUS=940;
-const DIRECT_FAST_GAP=.125;
 const RELAY_FAST_GAP=.16;
 const DIRECT_VISUAL_GAP=.34;
 const RELAY_VISUAL_GAP=.46;
@@ -191,8 +190,12 @@ netBroadcast=function(data){
   const limit=routeIsState?STATE_BUFFER_DROP:FALLBACK_BUFFER_DROP;
   if(!relay&&buffered(route)>limit){stats.droppedBuffered++;continue}
 
-  const fg=relay?RELAY_FAST_GAP:DIRECT_FAST_GAP,last=fastAt.get(control);
-  if(last==null||hostT<last||hostT-last>=fg-.0001){
+  /* Direct P2P snapshots are already called at the host's 8 Hz game cadence.
+     Do not add a second clock gate here: urgent same-tick snapshots (buffs,
+     rewards, resume/state changes) must be delivered immediately. Only the
+     relay path is rate-limited because it is broker-backed. */
+  const last=fastAt.get(control);
+  if(!relay||last==null||hostT<last||hostT-last>=RELAY_FAST_GAP-.0001){
    const p=fastPacket(s,control),bytes=sizeOf(p);
    if(safeSend(route,p)){
     fastAt.set(control,hostT);stats.statePackets++;if(!routeIsState)stats.fallbackPackets++;
