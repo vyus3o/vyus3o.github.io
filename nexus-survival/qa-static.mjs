@@ -21,7 +21,7 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
-const verify19=read('game-verify-v19.js');
+const verify20=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
 const multiFix=read('game-multiplayer-v19.js');
 const visual20=read('game-visual-v20.js');
@@ -70,7 +70,7 @@ check('visual:ultimate-aura',visual20.includes("p.subclass==='berserker'")&&visu
 
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa-19',verify19.includes("build:'0.19'")&&verify19.includes('multiplayerRewardFix')&&verify19.includes('dashClockSync'));
+check('runtime:self-qa-20',verify20.includes("build:'0.20'")&&verify20.includes('visualBuild')&&verify20.includes('monsterVisuals')&&verify20.includes('bossVisuals'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
