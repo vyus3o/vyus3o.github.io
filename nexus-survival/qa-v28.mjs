@@ -18,14 +18,15 @@ try{
    diff='NORMAL';cls='warrior';g=createRunFromLobby();state='play';g.localId='p1';NET.localId='p1';
    for(const p of Object.values(g.players)){p.pendingLevel=false;p.xp=0}
    const before=g.t;for(const p of Object.values(g.players))requestLevel(p);const pausedState=state,pendingBefore=Object.values(g.players).filter(p=>p.pendingLevel).map(p=>p.id).sort();updateHost(.5);const frozen=g.t===before;
+   const pausePacket=conns.some(c=>c.sent.some(m=>m?.t==='v28LevelPause'||m?.t==='v32LevelRound'));
    selectChoice({type:'endless',id:'E01'});for(const id of ['p2','p3','p4','p5'])netApplyRemoteChoice(id,{type:'endless',id:'E01'});
-   const after={state,pending:Object.values(g.players).filter(p=>p.pendingLevel).map(p=>p.id),resume:conns.some(c=>c.sent.some(m=>m?.t==='v28LevelResume')),pause:conns.some(c=>c.sent.some(m=>m?.t==='v28LevelPause')),ui:!!document.getElementById('partyLevelStatus28')};
-   return {lobby,ids,pausedState,pendingBefore,frozen,after,flags:window.NEXUS_PARTY_V28};
+   const after={state,pending:Object.values(g.players).filter(p=>p.pendingLevel).map(p=>p.id),resume:conns.some(c=>c.sent.some(m=>m?.t==='v28LevelResume'||m?.t==='v32LevelResume')),pause:pausePacket,ui:!!document.getElementById('partyLevelStatus28'),uiHidden:document.getElementById('levelModal')?.classList.contains('hidden')===true};
+   return {lobby,ids,pausedState,pendingBefore,frozen,after,flags:window.NEXUS_PARTY_V28,sync32:!!window.NEXUS_PARTY_SYNC_V32};
  })()`));
  if(result.lobby.join(',')!=='p1,p2,p3,p4,p5'||result.ids.join(',')!=='p2,p3,p4,p5')fail('5-player assignment',JSON.stringify(result));
  if(result.pausedState!=='partyLevel'||result.pendingBefore.length!==5||!result.frozen)fail('global level pause/freeze',JSON.stringify(result));
- if(result.after.state!=='play'||result.after.pending.length||!result.after.resume||!result.after.pause||!result.after.ui)fail('wait-all resume',JSON.stringify(result));
+ if(result.after.state!=='play'||result.after.pending.length||!result.after.resume||!result.after.pause||!result.after.ui||!result.after.uiHidden)fail('wait-all resume',JSON.stringify(result));
  console.log('PASS v28:5p-native-slots',JSON.stringify({lobby:result.lobby,ids:result.ids}));
- console.log('PASS v28:party-level-pause',JSON.stringify({pending:result.pendingBefore,frozen:result.frozen,resume:result.after.resume}));
+ console.log('PASS v28:party-level-pause',JSON.stringify({pending:result.pendingBefore,frozen:result.frozen,resume:result.after.resume,pausePacket:result.after.pause,uiHidden:result.after.uiHidden,sync32:result.sync32}));
  if(errors.length)fail('browser errors',errors.join(' | '));console.log('2/2 build 0.28 party/link checks passed');
 }finally{await browser.close()}
