@@ -53,7 +53,7 @@ try{
   const marker=window.NEXUS_PIXEL_V32,preview=document.querySelectorAll('.pixelClassPreview32').length,p=g.players.p1;
   let draws=0;const real=ctx.drawImage.bind(ctx);ctx.drawImage=(...a)=>{draws++;return real(...a)};
   drawPlayer(p,true);
-  updateCamera();
+  g.cam.x=Math.max(0,Math.min(WORLD.w-W,p.x-W/2));g.cam.y=Math.max(0,Math.min(WORLD.h-H,p.y-H/2));
   const cam={x:g.cam.x,y:g.cam.y};
   const samples=[
    {e:{id:990,x:p.x+80,y:p.y,r:18,hp:10,max:10,type:0,grade:'common',variantRole:'hunter',anim:0},w:90,h:110},
