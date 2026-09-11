@@ -12,30 +12,19 @@ try{
  await page.waitForFunction(b=>window.NEXUS_RUNTIME_CHECK?.build===b,{timeout:15000},expected);
  const runtime=await page.evaluate(()=>window.NEXUS_RUNTIME_CHECK);if(!runtime.ok)fail('runtime',JSON.stringify(runtime.failed));
  const flags=await page.evaluate(()=>window.NEXUS_NETWORK_V29);
- if(!flags?.turnFallback||flags.turnUrls<3||flags.stunUrls<3||flags.maxPlayers!==5||flags.joinAttempts<5)fail('network flags',JSON.stringify(flags));
+ if(!flags?.turnFallback||!flags.authenticatedTurn||!flags.timeLimitedCredentials||flags.turnUrls<4||flags.stunUrls<3||flags.maxPlayers!==5||flags.joinAttempts<5)fail('network flags',JSON.stringify(flags));
  console.log('PASS v29:turn-flags',JSON.stringify(flags));
- const capture=await page.evaluate(async()=>{
-   const RealPeer=window.Peer,captured=[];
-   class FakeConn{
-     constructor(){this.open=false;this.peer='fake-host';this.handlers={};this.peerConnection={getStats:async()=>new Map()}}
-     on(k,fn){this.handlers[k]=fn;return this}
-     send(msg){if(msg?.t==='join'){setTimeout(()=>this.handlers.data?.({t:'welcome',id:'p2',room:'ABC123',lobby:{p1:{id:'p1',cls:'warrior',name:'HOST'},p2:{id:'p2',cls:'mage',name:'PLAYER 2'}},diff:'NORMAL'}),0)}}
-     close(){this.open=false}
-   }
-   class FakePeer{
-     constructor(a,b){const opts=typeof a==='string'?b:a;captured.push(opts);this.handlers={};setTimeout(()=>this.handlers.open?.('fake-client'),0)}
-     on(k,fn){this.handlers[k]=fn;return this}
-     connect(){const c=new FakeConn();setTimeout(()=>{c.open=true;c.handlers.open?.()},0);return c}
-     destroy(){} reconnect(){}
-   }
-   window.Peer=FakePeer;
-   try{netJoin('ABC123');await new Promise(r=>setTimeout(r,80));}
-   finally{try{NET.peer?.destroy?.()}catch{}window.Peer=RealPeer;NET.mode='solo'}
-   const cfg=captured[0]?.config||{},ice=cfg.iceServers||[];
-   return {count:ice.length,turn:ice.filter(x=>String(x.urls).startsWith('turn:')).length,stun:ice.filter(x=>String(x.urls).startsWith('stun:')).length,policy:cfg.iceTransportPolicy,pool:cfg.iceCandidatePoolSize,status:document.getElementById('joinStatus')?.textContent||''};
+ const config=await page.evaluate(async()=>{
+   const ice=await window.NEXUS_BUILD_ICE29();
+   const turn=ice.filter(x=>String(x.urls).startsWith('turn'));
+   const user=turn[0]?.username||'',cred=turn[0]?.credential||'';
+   return {count:ice.length,turn:turn.length,stun:ice.filter(x=>String(x.urls).startsWith('stun:')).length,user,credLen:cred.length,expiry:Number(user.split(':')[0]||0),urls:turn.map(x=>x.urls)};
  });
- if(capture.turn<3||capture.stun<3||capture.policy!=='all'||capture.pool<1)fail('peer rtc config',JSON.stringify(capture));
- console.log('PASS v29:peer-config',JSON.stringify(capture));
+ if(config.turn<4||config.stun<3||config.credLen<20||config.expiry<Math.floor(Date.now()/1000)+3000||!config.urls.some(x=>String(x).startsWith('turns:')))fail('generated TURN credentials',JSON.stringify(config));
+ console.log('PASS v29:time-limited-credentials',JSON.stringify(config));
+ const relay=await page.evaluate(()=>window.NEXUS_TEST_TURN29(15000));
+ if(!relay?.ok)fail('real relay candidate',JSON.stringify(relay));
+ console.log('PASS v29:real-relay-candidate',relay.detail);
  if(errors.length)fail('browser errors',errors.join(' | '));
- console.log('2/2 build 0.29 TURN transport checks passed');
+ console.log('3/3 build 0.29 authenticated TURN checks passed');
 }finally{await browser.close()}
