@@ -25,7 +25,7 @@
     <div class="statusline">FORTRESS LINK // STANDBY</div>
     <div class="menuLayout">
       <div>
-        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 27</div>
+        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 28</div>
         <div class="heroTitle">NEXUS<span>SURVIVAL.</span></div>
         <div class="lead">50개 스테이지를 돌파하며 스킬 조합·전직·각성으로 빌드를 완성하는 최대 5인 협동 서바이벌 디펜스.</div>
         <div class="sectionLabel">MODE</div>
@@ -36,8 +36,10 @@
         <button id="start" class="startBtn">START RUN // 생존 시작</button>
       </div>
       <div class="manual">
-        <h3>FIELD MANUAL / 27</h3>
+        <h3>FIELD MANUAL / 28</h3>
         <p><b>7 BASE CLASSES</b><br>전사 · 궁수 · 마법사 · 성직자 · 네크로맨서 · 도적 · 총잡이.</p>
+        <p><b>PARTY LEVEL PAUSE</b><br>레벨업 화면이 열리면 전투 전체가 정지합니다. 멀티에서는 모든 플레이어가 자신의 선택을 끝낼 때까지 몬스터·보스·투사체·장판·타이머·쿨타임이 모두 멈춥니다.</p>
+        <p><b>5P LINK STABILITY</b><br>p2~p5 슬롯을 네트워크 최종 레이어에서 직접 관리하고 연결 재시도·끊긴 세션 정리·다중 STUN 경로를 사용합니다.</p>
         <p><b>OPENING BALANCE</b><br>스킬이 없는 STAGE 1 기준 기본 공격 DPS를 재조정하고 마법사·네크로맨서의 초반 사냥 성능을 보강했습니다.</p>
         <p><b>COMBAT READABILITY</b><br>원형 플레이어 표식을 코너 마커로 교체하고 보호막은 작은 육각 아이콘으로 표시합니다. 오른쪽 버프 HUD와 미니맵은 겹치지 않습니다.</p>
         <p><b>MOTION & DETAIL</b><br>직업별 공격 모션·이동 흔들림·대시 잔상, 몬스터 보행/부유/피격 반응, 보스 등장·페이즈 모션, 권역별 환경 입자와 넥서스 기계 애니메이션을 추가했습니다.</p>
@@ -56,8 +58,8 @@
     </div>
   </div>
 </div>
-<div id="hud" class="hidden"><div class="hudbox left"><div class="hudTitle" id="stage">STAGE 1</div><div class="tiny" id="time">00:00</div><div class="tiny" id="enemyInfo"></div></div><div class="hudbox top"><div class="row"><b>NEXUS CORE</b><span id="ntext"></span></div><div class="bar"><div id="nbar" class="fill"></div></div><div class="bar"><div id="corebar" class="fill corebar"></div></div><div class="tiny" id="core"></div><div id="bosshud" class="bosswrap hidden"><div class="row"><b id="bname"></b><span id="btext"></span></div><div class="bar"><div id="bbar" class="fill bossbar"></div></div></div></div><div class="hudbox bottom"><div class="row"><b id="pname"></b><span id="ptext"></span></div><div class="bar"><div id="pbar" class="fill hp"></div></div><div class="bar"><div id="xbar" class="fill xp"></div></div><div id="lvl" class="tiny"></div><div id="skillTags" class="skillTags"></div></div><div class="hudbox right"><div class="tiny">RUN DATA</div><div id="runData" class="hudTitle"></div><div id="netData" class="tiny"></div></div><div class="brandCorner">NEXUS SURVIVAL // BUILD 0.27</div></div>
-<div id="levelModal" class="modal hidden"><div class="modalbox"><div class="modalTitle">EVOLVE YOUR BUILD.</div><div class="modalSub">LEVEL-UP SAFE // 체력 완전 회복 · 선택하는 동안 피해를 받지 않습니다</div><div id="choices" class="choices"></div><button id="nexusBtn" class="nexusBtn">NEXUS INVESTMENT // 이번 성장을 기지에 투자 · CORE +100</button></div></div>
+<div id="hud" class="hidden"><div class="hudbox left"><div class="hudTitle" id="stage">STAGE 1</div><div class="tiny" id="time">00:00</div><div class="tiny" id="enemyInfo"></div></div><div class="hudbox top"><div class="row"><b>NEXUS CORE</b><span id="ntext"></span></div><div class="bar"><div id="nbar" class="fill"></div></div><div class="bar"><div id="corebar" class="fill corebar"></div></div><div class="tiny" id="core"></div><div id="bosshud" class="bosswrap hidden"><div class="row"><b id="bname"></b><span id="btext"></span></div><div class="bar"><div id="bbar" class="fill bossbar"></div></div></div></div><div class="hudbox bottom"><div class="row"><b id="pname"></b><span id="ptext"></span></div><div class="bar"><div id="pbar" class="fill hp"></div></div><div class="bar"><div id="xbar" class="fill xp"></div></div><div id="lvl" class="tiny"></div><div id="skillTags" class="skillTags"></div></div><div class="hudbox right"><div class="tiny">RUN DATA</div><div id="runData" class="hudTitle"></div><div id="netData" class="tiny"></div></div><div class="brandCorner">NEXUS SURVIVAL // BUILD 0.28</div></div>
+<div id="levelModal" class="modal hidden"><div class="modalbox"><div class="modalTitle">EVOLVE YOUR BUILD.</div><div class="modalSub">LEVEL-UP PAUSE // 선택이 끝날 때까지 전투 시간이 정지합니다</div><div id="choices" class="choices"></div><button id="nexusBtn" class="nexusBtn">NEXUS INVESTMENT // 이번 성장을 기지에 투자 · CORE +100</button></div></div>
 <div id="chestModal" class="modal hidden"><div class="modalbox rewardBox"><div class="eyebrow">BOSS TREASURE</div><div class="chestIcon"></div><div class="modalTitle">RELIC ACQUIRED</div><div id="reward" class="rewardText"></div><button id="rewardBtn" class="rewardBtn">CLAIM // 획득하고 다음 스테이지</button></div></div>
 <div id="endModal" class="modal hidden"><div class="modalbox rewardBox"><div class="eyebrow" id="endEyebrow">RUN TERMINATED</div><div class="modalTitle" id="endTitle">GAME OVER</div><div id="endText" class="rewardText"></div><button id="restartBtn" class="rewardBtn restartBtn">RESTART // 다시 시작</button><button id="returnMenuBtn" class="rewardBtn">RETURN // 메인 메뉴</button></div></div>
 <div id="toast" class="toast"></div></div>
@@ -88,10 +90,12 @@
 <script src="game-buildcraft-fix-v25.js?v=25"></script>
 <script src="game-polish-v26.js?v=26"></script>
 <script src="game-motion-v27.js?v=27"></script>
+<script src="game-party-v28.js?v=28"></script>
 <script src="game-verify-v16.js?v=20"></script>
 <script src="game-verify-v19.js?v=24"></script>
 <script src="game-verify-v25.js?v=25"></script>
 <script src="game-verify-v26.js?v=26"></script>
 <script src="game-verify-v27.js?v=27"></script>
+<script src="game-verify-v28.js?v=28"></script>
 </body>
 </html>
