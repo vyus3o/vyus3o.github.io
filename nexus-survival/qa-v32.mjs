@@ -52,12 +52,26 @@ try{
  const pixels=await host.evaluate(()=>eval(`(()=>{
   const marker=window.NEXUS_PIXEL_V32,preview=document.querySelectorAll('.pixelClassPreview32').length,p=g.players.p1;
   let draws=0;const real=ctx.drawImage.bind(ctx);ctx.drawImage=(...a)=>{draws++;return real(...a)};
-  drawPlayer(p,true);drawEnemy({id:990,x:p.x+80,y:p.y,r:18,hp:10,max:10,type:0,grade:'common',variantRole:'hunter',anim:0});drawEnemy({id:991,x:p.x+150,y:p.y,r:42,hp:100,max:100,type:0,boss:true,bossTier:'mid',anim:0});ctx.drawImage=real;
-  return{marker,preview,draws};
+  drawPlayer(p,true);
+  const samples=[
+   {e:{id:990,x:p.x+80,y:p.y,r:18,hp:10,max:10,type:0,grade:'common',variantRole:'hunter',anim:0},x:p.x+80,y:p.y,w:90,h:110},
+   {e:{id:991,x:p.x+150,y:p.y,r:42,hp:100,max:100,type:0,boss:true,bossTier:'mid',anim:0},x:p.x+150,y:p.y,w:150,h:150}
+  ];
+  let enemyChanged=0;
+  for(const s of samples){
+   const x=Math.max(0,Math.floor(s.x-s.w/2)),y=Math.max(0,Math.floor(s.y-s.h+24));
+   const w=Math.min(c.width-x,Math.floor(s.w)),h=Math.min(c.height-y,Math.floor(s.h));
+   const before=ctx.getImageData(x,y,w,h).data;
+   drawEnemy(s.e);
+   const after=ctx.getImageData(x,y,w,h).data;
+   for(let i=0;i<after.length;i+=4){if(before[i]!==after[i]||before[i+1]!==after[i+1]||before[i+2]!==after[i+2]||before[i+3]!==after[i+3])enemyChanged++}
+  }
+  ctx.drawImage=real;
+  return{marker,preview,draws,enemyChanged};
  })()`));
- if(!pixels.marker?.ready||pixels.marker.baseClasses!==7||pixels.marker.advancedClasses!==14||pixels.marker.bosses!==3||pixels.preview<7||pixels.draws<3)fail('pixel assets not applied',JSON.stringify(pixels));
+ if(!pixels.marker?.ready||pixels.marker.baseClasses!==7||pixels.marker.advancedClasses!==14||pixels.marker.bosses!==3||pixels.preview<7||pixels.draws<1||pixels.enemyChanged<20)fail('pixel/monster visibility not applied',JSON.stringify(pixels));
  const all=[hp,...clients];for(const x of all)if(x.errors.length)fail(`${x.label} browser errors`,x.errors.join(' | '));
  console.log('PASS v32: 4P level round survives missing one-off offers and resyncs missing choices');
  console.log('PASS v32: waits for all 4 players then resumes all clients');
- console.log('PASS v32: user pixel sprites rendered',JSON.stringify({classPreviews:pixels.preview,drawCalls:pixels.draws,atlas:pixels.marker.atlas}));
+ console.log('PASS v32: pixel classes + visible monster rendering',JSON.stringify({classPreviews:pixels.preview,drawCalls:pixels.draws,enemyChanged:pixels.enemyChanged,validEnemySprites:pixels.marker.validEnemySprites,enemyFallback:pixels.marker.enemyFallback,atlas:pixels.marker.atlas}));
 }finally{await browser.close()}
