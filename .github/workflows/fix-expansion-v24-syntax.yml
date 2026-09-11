@@ -1,0 +1,46 @@
+name: Fix expansion v24 syntax
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-expansion-v24-syntax.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fix exact missing object brace and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('nexus-survival/game-expansion-v24.js')
+          s=p.read_text()
+          old="\n }});\n\nconst ADV_OPTIONS24="
+          new="\n }}});\n\nconst ADV_OPTIONS24="
+          n=s.count(old)
+          print('exact matches:',n)
+          if n != 1:
+              raise SystemExit(f'expected exactly 1 match, got {n}')
+          p.write_text(s.replace(old,new,1))
+          PY
+          node --check nexus-survival/game-expansion-v24.js
+          for f in nexus-survival/*.js; do node --check "$f"; done
+      - name: Commit fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add nexus-survival/game-expansion-v24.js
+          git commit -m 'fix: close expansion advancement object'
+          git push
