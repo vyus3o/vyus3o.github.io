@@ -49,19 +49,16 @@ function recoverClient(reason='snapshot',s=null){
  return true;
 }
 
-/* Reset epoch/counters whenever a network session is explicitly closed. */
 if(typeof netClose==='function'){
  const prevNetCloseSync29=netClose;
  netClose=function(){resetSyncState();return prevNetCloseSync29()};
 }
 
-/* Stage epoch lets a normal later snapshot recover a client even if v13Resume was missed. */
 if(typeof advanceStage==='function'){
  const prevAdvanceSync29=advanceStage;
  advanceStage=function(){const before=g?.stage;const out=prevAdvanceSync29();if(NET.mode==='host'&&g&&g.stage!==before)hostStageEpoch++;return out};
 }
 
-/* Every host snapshot carries monotonically increasing sync metadata. */
 if(typeof makeNetState==='function'){
  const prevMakeSync29=makeNetState;
  makeNetState=function(){
@@ -71,7 +68,6 @@ if(typeof makeNetState==='function'){
  };
 }
 
-/* A stage change is a discontinuity: do not interpolate from the previous stage. */
 if(typeof applyNetSnapshot==='function'){
  const prevApplySync29=applyNetSnapshot;
  applyNetSnapshot=function(s,initial=false){const stageChanged=!!(g&&s&&Number.isFinite(s.stage)&&s.stage!==g.stage);return prevApplySync29(s,initial||stageChanged)};
@@ -86,9 +82,9 @@ function compactRelaySnapshot(data){
 
 /*
  * Do not let ordered/reliable snapshot packets build an ever-growing queue.
- * Direct P2P keeps the existing cadence; WebRelay is capped near 4 Hz.
- * If a DataChannel is already backed up, drop the obsolete snapshot because a
- * newer authoritative snapshot will follow shortly.
+ * Direct P2P keeps the original cadence and only drops when its DataChannel is
+ * truly backed up. WebRelay is capped near 4 Hz because the public WSS path is
+ * much more sensitive to large late-stage snapshots.
  */
 if(typeof netBroadcast==='function'){
  const prevBroadcastSync29=netBroadcast;
@@ -97,8 +93,8 @@ if(typeof netBroadcast==='function'){
    const now=nowMs();
    for(const conn of NET.conns?.values?.()||[]){
     if(!conn?.open)continue;
-    const relay=isWebRelay(conn),minGap=relay?220:105,last=snapshotTimes.get(conn)||0;
-    if(now-last<minGap){syncStats.snapSkippedRate++;continue}
+    const relay=isWebRelay(conn),minGap=relay?220:0,last=snapshotTimes.get(conn)||0;
+    if(minGap>0&&now-last<minGap){syncStats.snapSkippedRate++;continue}
     const dc=dataChannelOf(conn),buffered=Number(dc?.bufferedAmount||0);
     if(buffered>512*1024){syncStats.snapSkippedBuffer++;continue}
     snapshotTimes.set(conn,now);
@@ -118,7 +114,6 @@ if(typeof netBroadcast==='function'){
  };
 }
 
-/* A probe bypasses the periodic snapshot path and sends one fresh full state. */
 if(typeof netHostMessage==='function'){
  const prevHostSync29=netHostMessage;
  netHostMessage=function(conn,msg){
@@ -137,8 +132,6 @@ if(typeof netClientMessage==='function'){
   if(!msg||typeof msg!=='object')return prevClientSync29(msg);
   lastClientRxAt=nowMs();
   const meta=messageMeta(msg),advancedStage=!!(meta&&meta.stageEpoch>clientStageEpoch),advancedResume=!!(meta&&meta.resumeEpoch>clientResumeEpoch);
-
-  /* Critical resume packets are replayed; suppress duplicate UI/toast work. */
   if(RESUME_TYPES.has(msg.t)&&meta&&meta.resumeEpoch<=clientResumeEpoch)return;
 
   if(msg.t==='v29SyncFull'&&msg.state){
@@ -149,7 +142,6 @@ if(typeof netClientMessage==='function'){
   }
 
   const out=prevClientSync29(msg);
-
   if(msg.t==='start'||msg.t==='snap'||RESUME_TYPES.has(msg.t)){
    if(msg.t==='start'||msg.t==='snap')lastClientSnapAt=nowMs();
    if(meta){
@@ -162,7 +154,6 @@ if(typeof netClientMessage==='function'){
  };
 }
 
-/* Independent watchdog still runs while updateClient() is intentionally gated by state. */
 if(!window.__NEXUS_CLIENT_SYNC_GUARD29){
  window.__NEXUS_CLIENT_SYNC_GUARD29=setInterval(()=>{
   try{
