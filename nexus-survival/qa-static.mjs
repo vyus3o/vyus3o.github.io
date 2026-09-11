@@ -76,7 +76,7 @@ check('swarm:3-roles',['swift','brute','hunter'].every(x=>swarm21.includes(`${x}
 check('swarm:grade-xp',swarm21.includes('gradeXp=')&&swarm21.includes("g.gem[i].v=Math.max(1,Math.round"));
 check('swarm:grade-colors',swarm21.includes("'#7ed36e'")&&swarm21.includes("'#62b9ff'")&&swarm21.includes("'#c47cff'")&&swarm21.includes("'#ffbd55'"));
 check('swarm:network-sync',swarm21.includes('d.grade=e.grade')&&swarm21.includes('e.grade=d.grade'));
-check('swarm:faster-entry',swarm21.includes('const mx=26+Math.random()*42')&&swarm21.includes('const my=22+Math.random()*38'));
+check('swarm:faster-entry',swarm21.includes('mx=26+Math.random()*42')&&swarm21.includes('my=22+Math.random()*38'));
 
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
