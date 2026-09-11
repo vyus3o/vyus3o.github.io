@@ -53,21 +53,24 @@ try{
   const marker=window.NEXUS_PIXEL_V32,preview=document.querySelectorAll('.pixelClassPreview32').length,p=g.players.p1;
   let draws=0;const real=ctx.drawImage.bind(ctx);ctx.drawImage=(...a)=>{draws++;return real(...a)};
   drawPlayer(p,true);
+  updateCamera();
+  const cam={x:g.cam.x,y:g.cam.y};
   const samples=[
-   {e:{id:990,x:p.x+80,y:p.y,r:18,hp:10,max:10,type:0,grade:'common',variantRole:'hunter',anim:0},x:p.x+80,y:p.y,w:90,h:110},
-   {e:{id:991,x:p.x+150,y:p.y,r:42,hp:100,max:100,type:0,boss:true,bossTier:'mid',anim:0},x:p.x+150,y:p.y,w:150,h:150}
+   {e:{id:990,x:p.x+80,y:p.y,r:18,hp:10,max:10,type:0,grade:'common',variantRole:'hunter',anim:0},w:90,h:110},
+   {e:{id:991,x:p.x+150,y:p.y,r:42,hp:100,max:100,type:0,boss:true,bossTier:'mid',anim:0},w:150,h:150}
   ];
   let enemyChanged=0;
   for(const s of samples){
-   const x=Math.max(0,Math.floor(s.x-s.w/2)),y=Math.max(0,Math.floor(s.y-s.h+24));
-   const w=Math.min(c.width-x,Math.floor(s.w)),h=Math.min(c.height-y,Math.floor(s.h));
+   const screenX=s.e.x-cam.x,screenY=s.e.y-cam.y;
+   const x=Math.max(0,Math.floor(screenX-s.w/2)),y=Math.max(0,Math.floor(screenY-s.h+24));
+   const w=Math.max(1,Math.min(c.width-x,Math.floor(s.w))),h=Math.max(1,Math.min(c.height-y,Math.floor(s.h)));
    const before=ctx.getImageData(x,y,w,h).data;
-   drawEnemy(s.e);
+   ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.translate(-cam.x,-cam.y);drawEnemy(s.e);ctx.restore();
    const after=ctx.getImageData(x,y,w,h).data;
    for(let i=0;i<after.length;i+=4){if(before[i]!==after[i]||before[i+1]!==after[i+1]||before[i+2]!==after[i+2]||before[i+3]!==after[i+3])enemyChanged++}
   }
   ctx.drawImage=real;
-  return{marker,preview,draws,enemyChanged};
+  return{marker,preview,draws,enemyChanged,cam};
  })()`));
  if(!pixels.marker?.ready||pixels.marker.baseClasses!==7||pixels.marker.advancedClasses!==14||pixels.marker.bosses!==3||pixels.preview<7||pixels.draws<1||pixels.enemyChanged<20)fail('pixel/monster visibility not applied',JSON.stringify(pixels));
  const all=[hp,...clients];for(const x of all)if(x.errors.length)fail(`${x.label} browser errors`,x.errors.join(' | '));
