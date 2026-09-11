@@ -11,7 +11,7 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js','game-power-v22.js',
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js','game-power-v22.js','game-buffs-v23.js',
   'game-verify-v16.js','game-verify-v19.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
@@ -21,18 +21,19 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
-const verify22=read('game-verify-v19.js');
+const verify23=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
 const multiFix=read('game-multiplayer-v19.js');
 const visual20=read('game-visual-v20.js');
 const swarm21=read('game-swarm-v21.js');
 const power22=read('game-power-v22.js');
+const buffs23=read('game-buffs-v23.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.22',index.includes('BUILD 0.22')&&index.includes('PROTOCOL // 22'));
-check('cache:v22',/game-power-v22\.js\?v=22/.test(index)&&/game-verify-v19\.js\?v=22/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-power-v22.js'));
+check('build:0.23',index.includes('BUILD 0.23')&&index.includes('PROTOCOL // 23'));
+check('cache:v23',/game-buffs-v23\.js\?v=23/.test(index)&&/game-verify-v19\.js\?v=23/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-buffs-v23.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -86,9 +87,16 @@ check('power:cap',power22.includes('const CAP=1.24'));
 check('power:preserve-upgrades',power22.includes('/prev*next'));
 check('power:host-authoritative',power22.includes('const oldUpdateHost22=updateHost')&&power22.includes("state==='play'"));
 
+check('buff:v23-marker',buffs23.includes("build:'0.23'")&&buffs23.includes('rightHud:true')&&buffs23.includes('hostClockSync:true'));
+check('buff:network-fields',buffs23.includes("'atkBuffUntil'")&&buffs23.includes("'_seraphWingUntil'")&&buffs23.includes("'_guardianUltUntil'")&&buffs23.includes('for(const k of TIMED_FIELDS)'));
+check('buff:right-hud',buffs23.includes("holder.id='buffTracker'")&&buffs23.includes('ACTIVE BUFFS'));
+check('buff:duration-bars',buffs23.includes('fmtTime')&&buffs23.includes('buffBar')&&buffs23.includes('width:${b.pct.toFixed(1)}%'));
+check('buff:mobile-layout',buffs23.includes('@media(pointer:coarse)')&&buffs23.includes('top:108px'));
+check('buff:party-indicator',buffs23.includes('partyAffected')&&buffs23.includes('PARTY ${n}P'));
+
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa-22',verify22.includes("build:'0.22'")&&verify22.includes('powerBuild')&&verify22.includes('gentlePowerStart')&&verify22.includes('gentlePowerCap'));
+check('runtime:self-qa-23',verify23.includes("build:'0.23'")&&verify23.includes('buffBuild')&&verify23.includes('buffRightHud')&&verify23.includes('buffHostClock'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
