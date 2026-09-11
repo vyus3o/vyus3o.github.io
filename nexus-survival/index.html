@@ -25,9 +25,9 @@
     <div class="statusline">FORTRESS LINK // STANDBY</div>
     <div class="menuLayout">
       <div>
-        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 24</div>
+        <div class="eyebrow">NEXUS DEFENSE PROTOCOL // 25</div>
         <div class="heroTitle">NEXUS<span>SURVIVAL.</span></div>
-        <div class="lead">50개 스테이지를 돌파하며 전직과 각성으로 성장하는 최대 5인 협동 서바이벌 디펜스.</div>
+        <div class="lead">50개 스테이지를 돌파하며 스킬 조합·전직·각성으로 빌드를 완성하는 최대 5인 협동 서바이벌 디펜스.</div>
         <div class="sectionLabel">MODE</div>
         <div class="modeRow"><button id="modeSolo" class="modeBtn sel">SOLO</button><button id="modeHost" class="modeBtn">MULTI // 방 만들기</button><button id="modeJoin" class="modeBtn">MULTI // 참가</button></div>
         <div id="multiBox" class="multiBox hidden"><div id="hostControls" class="hidden"><div class="roomLine"><span>ROOM CODE</span><b id="roomCode">----</b><button id="copyRoom" class="miniBtn">복사</button></div><div id="hostStatus" class="tiny">방 생성 준비 중</div></div><div id="joinControls" class="hidden"><div class="joinRow"><input id="roomInput" maxlength="8" placeholder="방 코드 입력"><button id="joinBtn" class="miniBtn">참가</button></div><div id="joinStatus" class="tiny">방 코드를 입력하세요</div></div><div id="lobbyPlayers" class="lobbyPlayers"></div></div>
@@ -36,24 +36,24 @@
         <button id="start" class="startBtn">START RUN // 생존 시작</button>
       </div>
       <div class="manual">
-        <h3>FIELD MANUAL / 24</h3>
+        <h3>FIELD MANUAL / 25</h3>
         <p><b>7 BASE CLASSES</b><br>전사 · 궁수 · 마법사 · 성직자 · 네크로맨서 · 도적 · 총잡이.</p>
-        <p><b>14 ADVANCEMENTS</b><br>STAGE 10에서 각 기본 직업이 2개 전직으로 분기합니다. 네크로맨서→리치/네크로 로드 · 도적→어쌔신/섀도우 댄서 · 총잡이→데스페라도/아틸러리스트.</p>
+        <p><b>DEEP BUILDCRAFT</b><br>기본 스킬 105종 + 전직 스킬 168종. 기본/전직 스킬 모두 Lv.10까지 성장하며 Lv.10에서 MASTER 효과가 추가됩니다.</p>
+        <p><b>SKILL SYNERGY</b><br>모든 직업/전직 스킬이 최소 하나 이상의 조합에 참여합니다. 조합이 완성되면 투사체·폭발·장판·소환·표식·처형·회복 등 실제 전투 동작이 변합니다.</p>
+        <p><b>14 ADVANCEMENTS</b><br>STAGE 10에서 각 기본 직업이 2개 전직으로 분기하며 전직 전용 스킬 12종 중 최대 3종을 선택해 빌드를 구성합니다.</p>
         <p><b>5P MULTI</b><br>최대 5인 협동. 5인 전용 적/보스 체력과 생성 압박 배율을 사용합니다.</p>
         <p><b>BOSS HIERARCHY</b><br>매 5 STAGE는 MID BOSS, 매 10 STAGE는 STAGE BOSS. 체력·데미지·패턴 수·시전 빈도가 단계적으로 상승합니다.</p>
-        <p><b>BOSS ADDS</b><br>보스가 살아 있는 동안에도 일반 몬스터가 계속 생성됩니다. 보스전 전용 상한과 생성 간격으로 난이도를 제어합니다.</p>
+        <p><b>BOSS ADDS</b><br>보스가 살아 있는 동안에도 일반 몬스터가 계속 생성됩니다.</p>
         <p><b>PROGRESSION</b><br>총 50 STAGE · STAGE 10 전직 · STAGE 30 각성 · STAGE 50 최종 레이드.</p>
         <p><b>PC</b><br>WASD 이동 · SPACE 직업별 회피기 · R 각성기 · 공격 자동.</p>
-        <p><b>MULTI REWARD</b><br>보스 처치 시 모든 참가자가 자신의 빌드에 맞는 개인 보상을 받습니다.</p>
         <p><b>SWARM / GRADES</b><br>일반 몬스터 생성량 2배 · COMMON/UNCOMMON/RARE/EPIC/LEGENDARY 등급별 색상·체급·경험치 차등.</p>
-        <p><b>POWER CURVE</b><br>플레이어 공격력은 STAGE 1 약 +4%에서 STAGE 50 약 +24%까지 완만하게 보정됩니다.</p>
-        <p><b>BUFF TRACKER</b><br>오른쪽 HUD에서 기존 직업과 신규 직업의 지속 버프·소환·각성기 남은 시간을 확인합니다.</p>
-        <p><b>MOBILE</b><br>세로 화면 · 왼쪽 조이스틱 · 오른쪽 회피/ULT 버튼. 7직업 모두 전용 대시 프로필을 사용합니다.</p>
+        <p><b>BUFF TRACKER</b><br>오른쪽 HUD에서 지속 버프·소환·각성기 남은 시간을 확인합니다.</p>
+        <p><b>MOBILE</b><br>세로 화면 · 왼쪽 조이스틱 · 오른쪽 회피/ULT 버튼.</p>
       </div>
     </div>
   </div>
 </div>
-<div id="hud" class="hidden"><div class="hudbox left"><div class="hudTitle" id="stage">STAGE 1</div><div class="tiny" id="time">00:00</div><div class="tiny" id="enemyInfo"></div></div><div class="hudbox top"><div class="row"><b>NEXUS CORE</b><span id="ntext"></span></div><div class="bar"><div id="nbar" class="fill"></div></div><div class="bar"><div id="corebar" class="fill corebar"></div></div><div class="tiny" id="core"></div><div id="bosshud" class="bosswrap hidden"><div class="row"><b id="bname"></b><span id="btext"></span></div><div class="bar"><div id="bbar" class="fill bossbar"></div></div></div></div><div class="hudbox bottom"><div class="row"><b id="pname"></b><span id="ptext"></span></div><div class="bar"><div id="pbar" class="fill hp"></div></div><div class="bar"><div id="xbar" class="fill xp"></div></div><div id="lvl" class="tiny"></div><div id="skillTags" class="skillTags"></div></div><div class="hudbox right"><div class="tiny">RUN DATA</div><div id="runData" class="hudTitle"></div><div id="netData" class="tiny"></div></div><div class="brandCorner">NEXUS SURVIVAL // BUILD 0.24</div></div>
+<div id="hud" class="hidden"><div class="hudbox left"><div class="hudTitle" id="stage">STAGE 1</div><div class="tiny" id="time">00:00</div><div class="tiny" id="enemyInfo"></div></div><div class="hudbox top"><div class="row"><b>NEXUS CORE</b><span id="ntext"></span></div><div class="bar"><div id="nbar" class="fill"></div></div><div class="bar"><div id="corebar" class="fill corebar"></div></div><div class="tiny" id="core"></div><div id="bosshud" class="bosswrap hidden"><div class="row"><b id="bname"></b><span id="btext"></span></div><div class="bar"><div id="bbar" class="fill bossbar"></div></div></div></div><div class="hudbox bottom"><div class="row"><b id="pname"></b><span id="ptext"></span></div><div class="bar"><div id="pbar" class="fill hp"></div></div><div class="bar"><div id="xbar" class="fill xp"></div></div><div id="lvl" class="tiny"></div><div id="skillTags" class="skillTags"></div></div><div class="hudbox right"><div class="tiny">RUN DATA</div><div id="runData" class="hudTitle"></div><div id="netData" class="tiny"></div></div><div class="brandCorner">NEXUS SURVIVAL // BUILD 0.25</div></div>
 <div id="levelModal" class="modal hidden"><div class="modalbox"><div class="modalTitle">EVOLVE YOUR BUILD.</div><div class="modalSub">LEVEL-UP SAFE // 체력 완전 회복 · 선택하는 동안 피해를 받지 않습니다</div><div id="choices" class="choices"></div><button id="nexusBtn" class="nexusBtn">NEXUS INVESTMENT // 이번 성장을 기지에 투자 · CORE +100</button></div></div>
 <div id="chestModal" class="modal hidden"><div class="modalbox rewardBox"><div class="eyebrow">BOSS TREASURE</div><div class="chestIcon"></div><div class="modalTitle">RELIC ACQUIRED</div><div id="reward" class="rewardText"></div><button id="rewardBtn" class="rewardBtn">CLAIM // 획득하고 다음 스테이지</button></div></div>
 <div id="endModal" class="modal hidden"><div class="modalbox rewardBox"><div class="eyebrow" id="endEyebrow">RUN TERMINATED</div><div class="modalTitle" id="endTitle">GAME OVER</div><div id="endText" class="rewardText"></div><button id="restartBtn" class="rewardBtn restartBtn">RESTART // 다시 시작</button><button id="returnMenuBtn" class="rewardBtn">RETURN // 메인 메뉴</button></div></div>
@@ -81,7 +81,9 @@
 <script src="game-expansion-v24.js?v=24"></script>
 <script src="game-expansion-fix-v24.js?v=24"></script>
 <script src="game-boss-tiers-v24.js?v=24"></script>
+<script src="game-buildcraft-v25.js?v=25"></script>
 <script src="game-verify-v16.js?v=20"></script>
 <script src="game-verify-v19.js?v=24"></script>
+<script src="game-verify-v25.js?v=25"></script>
 </body>
 </html>
