@@ -11,7 +11,8 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-verify-v16.js','game-verify-v19.js'
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js',
+  'game-verify-v16.js','game-verify-v19.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
 
@@ -23,12 +24,13 @@ const verify=read('game-verify-v16.js');
 const verify19=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
 const multiFix=read('game-multiplayer-v19.js');
+const visual20=read('game-visual-v20.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.19',index.includes('BUILD 0.19')&&index.includes('PROTOCOL // 19'));
-check('cache:v19',/game-multiplayer-v19\.js\?v=19/.test(index)&&/game-progression-v13\.js\?v=19/.test(index)&&/game-multi\.js\?v=19/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-multiplayer-v19.js'));
+check('build:0.20',index.includes('BUILD 0.20')&&index.includes('PROTOCOL // 20'));
+check('cache:v20',/game-visual-v20\.js\?v=20/.test(index)&&/game-multiplayer-v19\.js\?v=20/.test(index)&&/game-progression-v13\.js\?v=20/.test(index)&&/game-multi\.js\?v=20/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-visual-v20.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -58,6 +60,14 @@ check('multi:client-chest',multiFix.includes("state='chest'")&&multiFix.includes
 check('multi:no-double-reward',multiFix.includes('g.pendingChestRewards={}'));
 check('multi:dash-host-clock',multiFix.includes('d.dashReadyAt=')&&multiFix.includes('d.dashInvulUntil='));
 check('multi:fix-marker',multiFix.includes("build:'0.19'")&&multiFix.includes('partyBossRewards:true')&&multiFix.includes('dashClockSync:true'));
+
+check('visual:v20-marker',visual20.includes("build:'0.20'")&&visual20.includes('monsterSilhouettes:25')&&visual20.includes('bossSilhouettes:15'));
+check('visual:5-biomes',visual20.includes('plainsEnemy')&&visual20.includes('plagueEnemy')&&visual20.includes('iceEnemy')&&visual20.includes('fireEnemy')&&visual20.includes('voidEnemy'));
+check('visual:boss-variety',visual20.includes('plainsBoss')&&visual20.includes('plagueBoss')&&visual20.includes('iceBoss')&&visual20.includes('fireBoss')&&visual20.includes('voidBoss'));
+check('visual:skill-vfx',visual20.includes('drawFx=function')&&visual20.includes('radialCracks')&&visual20.includes('hexShield')&&visual20.includes('burstBits'));
+check('visual:zone-vfx',visual20.includes("k==='blackhole'")&&visual20.includes("k==='arrowrain'")&&visual20.includes("k==='sanctuary'"));
+check('visual:ultimate-aura',visual20.includes("p.subclass==='berserker'")&&visual20.includes("p.subclass==='guardian'")&&visual20.includes("p.subclass==='elementalist'"));
+
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
 check('runtime:self-qa-19',verify19.includes("build:'0.19'")&&verify19.includes('multiplayerRewardFix')&&verify19.includes('dashClockSync'));
