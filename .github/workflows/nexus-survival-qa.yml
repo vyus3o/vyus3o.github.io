@@ -34,7 +34,7 @@ jobs:
           done
       - name: Game structure QA
         run: node nexus-survival/qa-static.mjs nexus-survival
-      - name: Browser runtime + multiplayer smoke test
+      - name: Browser runtime + real multiplayer smoke test
         shell: bash
         run: |
           set -euo pipefail
@@ -51,30 +51,31 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep .25
           done
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.18' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
-      - name: Wait for GitHub Pages build 0.18
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.19' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+      - name: Wait for GitHub Pages build 0.19
         shell: bash
         run: |
           set -euo pipefail
           READY=0
           for i in {1..90}; do
             HTML="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}-${i}" || true)"
-            SPAWN="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-spawn-v18.js?v=18&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.18' <<<"$HTML" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN"; then
+            MULTI="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-multiplayer-v19.js?v=19&qa=${GITHUB_SHA}-${i}" || true)"
+            SPAWN="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-spawn-v18.js?v=19&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.19' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN"; then
               READY=1
-              echo "Live build 0.18 is deployed"
+              echo "Live build 0.19 is deployed"
               break
             fi
             echo "Waiting for Pages deployment... ${i}/90"
             sleep 2
           done
           if [ "$READY" -ne 1 ]; then
-            echo 'GitHub Pages did not expose build 0.18 in time'
+            echo 'GitHub Pages did not expose build 0.19 in time'
             exit 1
           fi
-      - name: Live GitHub Pages runtime + multiplayer test
+      - name: Live GitHub Pages runtime + real multiplayer test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.18' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.19' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
