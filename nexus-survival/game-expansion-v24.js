@@ -42,7 +42,7 @@ Object.assign(ADV,{
  }},
  artillerist:{base:'gunslinger',name:'아틸러리스트',awaken:'워머신',col:'#e18461',passive:'폭발·관통 화력에 특화되며 공격속도 대신 한 발의 파괴력을 높입니다.',ult:'전면 포격',ultCd:80,skills:{
   AT01:{n:'중산탄',kind:'active',cd:7,max:3,desc:'강력한 산탄을 전방에 발사합니다.',lv:['7발','9발','11발']},AT02:{n:'로켓탄',kind:'active',cd:9,max:3,desc:'목표 지점에 대형 폭발을 일으킵니다.',lv:['230%','300%','390%']},AT03:{n:'지뢰 지대',kind:'active',cd:13,max:3,desc:'주변에 폭발 지뢰 영역을 설치합니다.',lv:['5초','6초','7초']},AT04:{n:'초중량 철갑탄',kind:'passive',cd:0,max:3,desc:'관통과 보스 피해가 증가합니다.',lv:['보스 +8%','+13%','+20%']},AT05:{n:'집중 포격',kind:'active',cd:16,max:3,desc:'목표 주변에 연속 폭격을 가합니다.',lv:['4회','6회','8회']}
- }});
+ }}});
 
 const ADV_OPTIONS24={warrior:['berserker','guardian'],archer:['ranger','sniper'],mage:['elementalist','warlock'],priest:['seraph','inquisitor'],necromancer:['lich','necrolord'],rogue:['assassin','shadowdancer'],gunslinger:['desperado','artillerist']};
 const TRANS24={
