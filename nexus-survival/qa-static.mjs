@@ -11,7 +11,7 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-verify-v16.js'
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-verify-v16.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
 
@@ -20,12 +20,13 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
+const spawnFix=read('game-spawn-v18.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.16',index.includes('BUILD 0.16')&&index.includes('PROTOCOL // 16'));
-check('cache:spawn-hotfix-v17',/game-verify-v16\.js\?v=16/.test(index)&&/game-progression-v13\.js\?v=17/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v16.js')>index.lastIndexOf('game-runtime-fix-v14.js'));
+check('build:0.18',index.includes('BUILD 0.18')&&index.includes('PROTOCOL // 18'));
+check('cache:v18',/game-spawn-v18\.js\?v=18/.test(index)&&/game-progression-v13\.js\?v=18/.test(index)&&/game-multi\.js\?v=18/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v16.js')>index.lastIndexOf('game-spawn-v18.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -46,11 +47,13 @@ check('progression:stage50-end',progression.includes("if(s===50){endGame"));
 check('progression:max-fallback',progression.includes("type:'endless'")&&progression.includes('MAX BUILD BONUS'));
 check('progression:R-input',progression.includes("e.code==='KeyR'")&&progression.includes("t:'v13Ult'"));
 check('progression:multiplayer-resume',progression.includes("t:'v13Resume'"));
-check('progression:spawn-timer-floor',progression.includes('const beforeNextEnemyId=g?.nextEnemyId||0;')&&progression.includes('g.nextEnemyId>beforeNextEnemyId')&&!progression.includes("if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());"));
+check('progression:spawn-timer-floor',progression.includes('g.nextEnemyId>beforeNextEnemyId')&&!progression.includes("if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());"));
 
+check('spawn:visible-edge',spawnFix.includes('randEdgeSpawn=function()')&&spawnFix.includes('halfW=W/2+mx')&&spawnFix.includes('halfH=H/2+my'));
+check('spawn:watchdog',spawnFix.includes('minPopulation')&&spawnFix.includes('g.t-g._spawnWatchAt>1.25')&&spawnFix.includes('spawn(false)'));
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa',verify.includes('window.NEXUS_RUN_QA=qa')&&verify.includes("build:'0.16'"));
+check('runtime:self-qa',verify.includes('window.NEXUS_RUN_QA=qa')&&verify.includes("build:'0.18'")&&verify.includes('spawnFix18'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
