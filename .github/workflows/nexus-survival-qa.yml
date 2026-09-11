@@ -62,7 +62,8 @@ jobs:
             MULTI="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-multiplayer-v19.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
             SPAWN="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-spawn-v18.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
             VISUAL="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-visual-v20.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.20' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN" && grep -q "NEXUS_VISUAL_V20" <<<"$VISUAL"; then
+            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v19.js?v=20r2&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.20' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN" && grep -q "NEXUS_VISUAL_V20" <<<"$VISUAL" && grep -q "build:'0.20'" <<<"$VERIFY"; then
               READY=1
               echo "Live build 0.20 is deployed"
               break
