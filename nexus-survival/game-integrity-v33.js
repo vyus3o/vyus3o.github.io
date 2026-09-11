@@ -152,6 +152,7 @@ function finishMilestone33(){
 const prevOpenChest33=openChest;
 openChest=function(){
  if(!g)return prevOpenChest33();
+ if(NET.mode==='solo')return prevOpenChest33();
  const s=g.stage+1;
  if(NET.mode==='client')return;
  if(s===10)return beginMilestone33('advancement');
