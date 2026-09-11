@@ -67,13 +67,13 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          sed -i "s/==='0\.24'/==='0.26'/" nexus-survival/qa-v24.mjs
-          CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v24.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.26' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v24.mjs
       - name: Local buildcraft + synergy QA
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          sed -i "s/window.NEXUS_RUNTIME_CHECK?.build==='0\.25'/window.NEXUS_RUNTIME_CHECK?.build==='0.26'/" nexus-survival/qa-v25.mjs
           CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v25.mjs
       - name: Local opening balance + HUD VFX QA
         shell: bash
