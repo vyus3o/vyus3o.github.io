@@ -11,7 +11,7 @@ const required=[
   'index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js',
   'game-elite-v9.js','game-vfx-v10.js','game-raid-v11.js','game-mobile-v12.js',
   'game-classes-v13.js','game-progression-v13.js','game-balance-fix-v13.js',
-  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js',
+  'game-runtime-fix-v14.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js','game-power-v22.js',
   'game-verify-v16.js','game-verify-v19.js'
 ];
 for(const f of required)check(`file:${f}`,exists(f));
@@ -21,17 +21,18 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 const classes=read('game-classes-v13.js');
 const progression=read('game-progression-v13.js');
 const verify=read('game-verify-v16.js');
-const verify21=read('game-verify-v19.js');
+const verify22=read('game-verify-v19.js');
 const spawnFix=read('game-spawn-v18.js');
 const multiFix=read('game-multiplayer-v19.js');
 const visual20=read('game-visual-v20.js');
 const swarm21=read('game-swarm-v21.js');
+const power22=read('game-power-v22.js');
 const raid=read('game-raid-v11.js');
 const mobile=read('game-mobile-v12.js');
 
-check('build:0.21',index.includes('BUILD 0.21')&&index.includes('PROTOCOL // 21'));
-check('cache:v21',/game-swarm-v21\.js\?v=21/.test(index)&&/game-verify-v19\.js\?v=21/.test(index));
-check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-swarm-v21.js'));
+check('build:0.22',index.includes('BUILD 0.22')&&index.includes('PROTOCOL // 22'));
+check('cache:v22',/game-power-v22\.js\?v=22/.test(index)&&/game-verify-v19\.js\?v=22/.test(index));
+check('verify:last-script',index.lastIndexOf('game-verify-v19.js')>index.lastIndexOf('game-power-v22.js'));
 check('mobile:portrait-meta',index.includes('name="screen-orientation" content="portrait"'));
 check('mobile:portrait-manifest',manifest.orientation==='portrait',`orientation=${manifest.orientation}`);
 check('mobile:smooth-dash',mobile.includes('startSmoothDash')&&mobile.includes('smoothDash12'));
@@ -78,9 +79,16 @@ check('swarm:grade-colors',swarm21.includes("'#7ed36e'")&&swarm21.includes("'#62
 check('swarm:network-sync',swarm21.includes('d.grade=e.grade')&&swarm21.includes('e.grade=d.grade'));
 check('swarm:faster-entry',swarm21.includes('mx=26+Math.random()*42')&&swarm21.includes('my=22+Math.random()*38'));
 
+check('power:v22-marker',power22.includes("build:'0.22'")&&power22.includes('stagePower'));
+check('power:gentle-start',power22.includes('const START=1.04'));
+check('power:per-stage',power22.includes('const PER_STAGE=.004'));
+check('power:cap',power22.includes('const CAP=1.24'));
+check('power:preserve-upgrades',power22.includes('/prev*next'));
+check('power:host-authoritative',power22.includes('const oldUpdateHost22=updateHost')&&power22.includes("state==='play'"));
+
 check('fix:transient-cleanup',verify.includes('_rangerUltUntil')&&verify.includes('_voidUltExplodeAt')&&verify.includes('_smoothDash'));
 check('fix:elite-50-curve',verify.includes('targetEliteProbability')&&verify.includes('for(let i=0;i<50;i++)'));
-check('runtime:self-qa-21',verify21.includes("build:'0.21'")&&verify21.includes('doubleSpawn')&&verify21.includes('monsterGrades')&&verify21.includes('gradeNetworkSync'));
+check('runtime:self-qa-22',verify22.includes("build:'0.22'")&&verify22.includes('powerBuild')&&verify22.includes('gentlePowerStart')&&verify22.includes('gentlePowerCap'));
 
 const failed=results.filter(x=>!x.ok);
 for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);
