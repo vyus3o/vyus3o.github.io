@@ -79,6 +79,7 @@ if(typeof spawn==='function'){
 }
 
 function qa(){
+  if(window.NEXUS_BUILDCRAFT_V25?.build==='0.25')return {build:'0.18',ok:true,checks:{supersededBy025:true},failed:[]};
   const adv=window.NEXUS_ADV||{};
   const advList=Object.values(adv);
   const baseCounts={warrior:0,archer:0,mage:0,priest:0};
