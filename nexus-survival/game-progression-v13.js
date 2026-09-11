@@ -197,10 +197,11 @@ updateHost=function(dt){
   const b=g.e?.find(e=>e.boss&&!e.dead);if(b?.raid)b.raid.cd=999;
   if(!g.boss&&g.t>=stageDuration())spawn(true);
  }
+ const beforeNextEnemyId=g?.nextEnemyId||0;
  const out=oldUpdateHost13(dt);
  if(g&&state==='play'){
   const b=g.e?.find(e=>e.boss&&!e.dead);if(b?.raid)b.raid.cd=999;
-  if(!g.boss)g.spawn=Math.max(g.spawn,spawnFloor());
+  if(!g.boss&&g.nextEnemyId>beforeNextEnemyId)g.spawn=Math.max(g.spawn,spawnFloor());
   window.nexusAdvTick?.(dt);raidTick(dt);
   if(g.e.length>260)g.e.splice(0,g.e.length-260);
  }
