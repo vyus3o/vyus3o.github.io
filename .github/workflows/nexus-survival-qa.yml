@@ -51,8 +51,8 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep .25
           done
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.22' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
-      - name: Wait for GitHub Pages build 0.22
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.23' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+      - name: Wait for GitHub Pages build 0.23
         shell: bash
         run: |
           set -euo pipefail
@@ -64,17 +64,18 @@ jobs:
             VISUAL="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-visual-v20.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
             SWARM="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-swarm-v21.js?v=21&qa=${GITHUB_SHA}-${i}" || true)"
             POWER="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-power-v22.js?v=22&qa=${GITHUB_SHA}-${i}" || true)"
-            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v19.js?v=22&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.22' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN" && grep -q "NEXUS_VISUAL_V20" <<<"$VISUAL" && grep -q "NEXUS_SWARM_V21" <<<"$SWARM" && grep -q "NEXUS_POWER_V22" <<<"$POWER" && grep -q "build:'0.22'" <<<"$VERIFY"; then
+            BUFFS="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-buffs-v23.js?v=23&qa=${GITHUB_SHA}-${i}" || true)"
+            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v19.js?v=23&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.23' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN" && grep -q "NEXUS_VISUAL_V20" <<<"$VISUAL" && grep -q "NEXUS_SWARM_V21" <<<"$SWARM" && grep -q "NEXUS_POWER_V22" <<<"$POWER" && grep -q "NEXUS_BUFFS_V23" <<<"$BUFFS" && grep -q "build:'0.23'" <<<"$VERIFY"; then
               READY=1
-              echo "Live build 0.22 is deployed"
+              echo "Live build 0.23 is deployed"
               break
             fi
             echo "Waiting for Pages deployment... ${i}/90"
             sleep 2
           done
           if [ "$READY" -ne 1 ]; then
-            echo 'GitHub Pages did not expose build 0.22 in time'
+            echo 'GitHub Pages did not expose build 0.23 in time'
             exit 1
           fi
       - name: Live GitHub Pages runtime + real multiplayer test
@@ -82,4 +83,4 @@ jobs:
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.22' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.23' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
