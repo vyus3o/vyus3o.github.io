@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 const root=process.argv[2]||'nexus-survival',read=f=>fs.readFileSync(path.join(root,f),'utf8'),exists=f=>fs.existsSync(path.join(root,f));
 const results=[],check=(name,ok,detail='')=>results.push({name,ok:!!ok,detail});
-const required=['index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js','game-mobile-v12.js','game-progression-v13.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js','game-power-v22.js','game-buffs-v23.js','game-expansion-v24.js','game-boss-tiers-v24.js','game-buildcraft-v25.js','game-polish-v26.js','game-motion-v27.js','game-party-v28.js','game-network-v29.js','game-verify-v29.js','qa-v29.mjs'];
+const required=['index.html','manifest.webmanifest','game-core.js','game-multi.js','game-render.js','game-mobile-v12.js','game-progression-v13.js','game-spawn-v18.js','game-multiplayer-v19.js','game-visual-v20.js','game-swarm-v21.js','game-power-v22.js','game-buffs-v23.js','game-expansion-v24.js','game-boss-tiers-v24.js','game-buildcraft-v25.js','game-polish-v26.js','game-motion-v27.js','game-party-v28.js','game-network-v29.js','game-verify-v29.js','qa-v29.mjs','game-network-v30.js','game-verify-v30.js','qa-v30.mjs'];
 for(const f of required)check(`file:${f}`,exists(f));
-const index=read('index.html'),manifest=JSON.parse(read('manifest.webmanifest')),progression=read('game-progression-v13.js'),spawn=read('game-spawn-v18.js'),multi=read('game-multiplayer-v19.js'),visual=read('game-visual-v20.js'),swarm=read('game-swarm-v21.js'),power=read('game-power-v22.js'),buffs=read('game-buffs-v23.js'),exp=read('game-expansion-v24.js'),boss=read('game-boss-tiers-v24.js'),buildcraft=read('game-buildcraft-v25.js'),polish=read('game-polish-v26.js'),motion=read('game-motion-v27.js'),party=read('game-party-v28.js'),network=read('game-network-v29.js'),verify=read('game-verify-v29.js'),mobile=read('game-mobile-v12.js');
-check('build:0.29',index.includes('BUILD 0.29')&&index.includes('PROTOCOL // 29'));
+const index=read('index.html'),manifest=JSON.parse(read('manifest.webmanifest')),progression=read('game-progression-v13.js'),spawn=read('game-spawn-v18.js'),multi=read('game-multiplayer-v19.js'),visual=read('game-visual-v20.js'),swarm=read('game-swarm-v21.js'),power=read('game-power-v22.js'),buffs=read('game-buffs-v23.js'),exp=read('game-expansion-v24.js'),boss=read('game-boss-tiers-v24.js'),buildcraft=read('game-buildcraft-v25.js'),polish=read('game-polish-v26.js'),motion=read('game-motion-v27.js'),party=read('game-party-v28.js'),network=read('game-network-v29.js'),verify=read('game-verify-v29.js'),network30=read('game-network-v30.js'),verify30=read('game-verify-v30.js'),mobile=read('game-mobile-v12.js');
+check('build:0.30',index.includes('BUILD 0.30')&&index.includes('PROTOCOL // 30')&&index.includes('game-network-v30.js?v=3001'));
 check('mobile:portrait',manifest.orientation==='portrait'&&index.includes('screen-orientation'));
 check('classes:7',['C.necromancer','C.rogue','C.gunslinger'].every(x=>exp.includes(x))&&index.includes('7 BASE CLASSES'));
 check('mobile:7-dashes',['warrior','archer','mage','priest','necromancer','rogue','gunslinger'].every(x=>mobile.includes(`${x}:{name:`)));
@@ -38,4 +38,9 @@ check('stability:duplicate-choice',network.includes('duplicateChoiceGuard:true')
 check('stability:pause-recovery',network.includes('disconnectPauseRecovery:true')&&network.includes('forceResumeIfReady')&&network.includes('lifetimeGuard'));
 check('stability:multi-replay',network.includes('multiReplayCleanup:true')&&network.includes('hardSessionCleanup')&&network.includes('sessionGeneration'));
 check('verify:web-relay',verify.includes('webRelayFallback')&&verify.includes('webRelayBrokers'));
+check('net30:compact',network30.includes('compactSnapshots:true')&&network30.includes('interestManagement:true')&&network30.includes("t:'v30f'"));
+check('net30:backpressure',network30.includes('BUFFER_HARD')&&network30.includes('bufferedAmount')&&network30.includes('snapshotBackpressure:true'));
+check('net30:prediction',network30.includes('MAX_EXTRAPOLATE_MS')&&network30.includes('clientExtrapolation:true'));
+check('net30:split-stream',network30.includes("t:'v30v'")&&network30.includes('separateVisualStream:true'));
+check('verify:0.30',verify30.includes("build:'0.30'")&&verify30.includes('compactSnapshots'));
 const failed=results.filter(x=>!x.ok);for(const r of results)console.log(`${r.ok?'PASS':'FAIL'} ${r.name}${r.detail?' · '+r.detail:''}`);console.log(`\n${results.length-failed.length}/${results.length} checks passed`);if(failed.length){console.error('FAILED:',failed.map(x=>x.name).join(', '));process.exit(1)}
