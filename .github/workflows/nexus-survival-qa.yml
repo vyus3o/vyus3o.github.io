@@ -99,25 +99,32 @@ jobs:
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.31' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31.mjs
-      - name: Wait for GitHub Pages build 0.31
+      - name: Local low-lag dual-channel 5-player QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.31' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v31-smooth.mjs
+      - name: Wait for GitHub Pages build 0.31 smooth hotfix
         shell: bash
         run: |
           set -euo pipefail
           READY=0
           for i in {1..100}; do
             HTML="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}-${i}" || true)"
-            NETWORK="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-network-v31.js?v=3101&qa=${GITHUB_SHA}-${i}" || true)"
-            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v31.js?v=3101&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.31' <<<"$HTML" && grep -q "NEXUS_NETWORK_V31" <<<"$NETWORK" && grep -q "build:'0.31'" <<<"$VERIFY"; then
+            NETWORK="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-network-v31.js?v=3102&qa=${GITHUB_SHA}-${i}" || true)"
+            SMOOTH="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-network-smooth-v31.js?v=3111&qa=${GITHUB_SHA}-${i}" || true)"
+            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v31.js?v=3102&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.31' <<<"$HTML" && grep -q "NEXUS_NETWORK_V31" <<<"$NETWORK" && grep -q "NEXUS_NETWORK_SMOOTH_V31" <<<"$SMOOTH" && grep -q "build:'0.31'" <<<"$VERIFY"; then
               READY=1
-              echo "Live build 0.31 is deployed"
+              echo "Live build 0.31 smooth hotfix is deployed"
               break
             fi
             echo "Waiting for Pages deployment... ${i}/100"
             sleep 2
           done
           if [ "$READY" -ne 1 ]; then
-            echo 'GitHub Pages did not expose build 0.31 in time'
+            echo 'GitHub Pages did not expose build 0.31 smooth hotfix in time'
             exit 1
           fi
       - name: Live GitHub Pages regression test
@@ -156,3 +163,9 @@ jobs:
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.31' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31.mjs
+      - name: Live low-lag dual-channel 5-player test
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.31' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v31-smooth.mjs
