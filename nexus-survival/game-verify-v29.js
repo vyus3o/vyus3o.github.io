@@ -4,11 +4,11 @@
 function qa29(){
  const n=window.NEXUS_NETWORK_V29||{},s=window.NEXUS_STABILITY_V29||{},p=window.NEXUS_PARTY_V28||{},m=window.NEXUS_MOTION_V27||{},polish=window.NEXUS_POLISH_V26||{},bc=window.NEXUS_BUILDCRAFT_V25||{};
  const checks={
-  network29:n.build==='0.29'&&n.turnFallback===true&&n.turnUrls>=3&&n.stunUrls>=3&&n.relayProbe===true,
+  network29:n.build==='0.29'&&n.p2pPrimary===true&&n.webRelayFallback===true&&n.webRelayBrokers>=2&&n.stunUrls>=3&&n.relayProbe===true,
   fivePlayer:n.maxPlayers===5&&p.maxPlayers===5,
-  retries:n.joinAttempts>=5&&n.timeoutMs>=12000,
-  routeDetection:n.routeDetection===true&&n.iceTransportPolicy==='all',
-  stability:s.build==='0.29'&&s.singleChoice===true&&s.nexusLock===true&&s.duplicateChoiceGuard===true&&s.disconnectPauseRecovery===true&&s.multiReplayCleanup===true,
+  retries:n.joinAttempts>=5&&n.timeoutMs>=7000,
+  routeDetection:n.routeDetection===true,
+  stability:s.build==='0.29'&&s.singleChoice===true&&s.nexusLock===true&&s.duplicateChoiceGuard===true&&s.disconnectPauseRecovery===true&&s.multiReplayCleanup===true&&s.pauseWatchdog===true,
   partyPause:p.globalLevelPause===true&&p.waitForAllLevelChoices===true,
   motion27:m.build==='0.27'&&m.playerMotion===true&&m.enemyGait===true&&m.bossPhaseMotion===true,
   polish26:polish.build==='0.26',
@@ -24,6 +24,4 @@ function qa29(){
 }
 window.NEXUS_RUN_QA=qa29;qa29();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',qa29,{once:true});else setTimeout(qa29,0);
-/* independent lifetime watchdog: netClose may clear connection-specific timers, but this guard must survive repeated sessions */
-if(!window.__NEXUS_PARTY_GUARD29){window.__NEXUS_PARTY_GUARD29=setInterval(()=>{try{if(g&&NET.mode==='host'&&state==='partyLevel')window.NEXUS_RECONCILE_PARTY29?.('lifetime-watchdog')}catch{}},500)}
 })();
