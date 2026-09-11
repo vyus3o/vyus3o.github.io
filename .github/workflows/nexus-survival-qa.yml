@@ -18,7 +18,7 @@ concurrency:
 jobs:
   qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,53 +34,71 @@ jobs:
           done
       - name: Game structure QA
         run: node nexus-survival/qa-static.mjs nexus-survival
-      - name: Browser runtime + real multiplayer smoke test
+      - name: Install browser test runtime
+        run: npm install --no-save --ignore-scripts puppeteer-core
+      - name: Start local game server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory nexus-survival >/tmp/nexus-http.log 2>&1 &
+          echo $! >/tmp/nexus-server.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep .25
+          done
+          cat /tmp/nexus-http.log || true
+          exit 1
+      - name: Local regression + multiplayer smoke test
         shell: bash
         run: |
           set -euo pipefail
-          npm install --no-save --ignore-scripts puppeteer-core
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME_BIN" ]; then
-            echo 'Chrome/Chromium was not found on the runner'
-            exit 1
-          fi
-          python3 -m http.server 4173 --directory nexus-survival >/tmp/nexus-http.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
-          for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
-            sleep .25
-          done
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.23' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
-      - name: Wait for GitHub Pages build 0.23
+          test -n "$CHROME_BIN"
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.25' NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-browser.mjs
+      - name: Local 5-player + boss hierarchy regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          sed -i "s/==='0\.24'/==='0.25'/" nexus-survival/qa-v24.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v24.mjs
+      - name: Local buildcraft + synergy QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL='http://127.0.0.1:4173/' node nexus-survival/qa-v25.mjs
+      - name: Wait for GitHub Pages build 0.25
         shell: bash
         run: |
           set -euo pipefail
           READY=0
-          for i in {1..90}; do
+          for i in {1..100}; do
             HTML="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}-${i}" || true)"
-            MULTI="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-multiplayer-v19.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
-            SPAWN="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-spawn-v18.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
-            VISUAL="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-visual-v20.js?v=20&qa=${GITHUB_SHA}-${i}" || true)"
-            SWARM="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-swarm-v21.js?v=21&qa=${GITHUB_SHA}-${i}" || true)"
-            POWER="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-power-v22.js?v=22&qa=${GITHUB_SHA}-${i}" || true)"
-            BUFFS="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-buffs-v23.js?v=23&qa=${GITHUB_SHA}-${i}" || true)"
-            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v19.js?v=23&qa=${GITHUB_SHA}-${i}" || true)"
-            if grep -q 'BUILD 0.23' <<<"$HTML" && grep -q "NEXUS_MULTI_FIX" <<<"$MULTI" && grep -q "NEXUS_SPAWN_FIX" <<<"$SPAWN" && grep -q "NEXUS_VISUAL_V20" <<<"$VISUAL" && grep -q "NEXUS_SWARM_V21" <<<"$SWARM" && grep -q "NEXUS_POWER_V22" <<<"$POWER" && grep -q "NEXUS_BUFFS_V23" <<<"$BUFFS" && grep -q "build:'0.23'" <<<"$VERIFY"; then
+            EXP="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-expansion-v24.js?v=24&qa=${GITHUB_SHA}-${i}" || true)"
+            BOSS="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-boss-tiers-v24.js?v=24&qa=${GITHUB_SHA}-${i}" || true)"
+            BUILDCRAFT="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-buildcraft-v25.js?v=25&qa=${GITHUB_SHA}-${i}" || true)"
+            VERIFY="$(curl -fsSL "https://vyus3o.github.io/nexus-survival/game-verify-v25.js?v=25&qa=${GITHUB_SHA}-${i}" || true)"
+            if grep -q 'BUILD 0.25' <<<"$HTML" && grep -q "NEXUS_EXPANSION_V24" <<<"$EXP" && grep -q "NEXUS_BOSS_TIERS_V24" <<<"$BOSS" && grep -q "NEXUS_BUILDCRAFT_V25" <<<"$BUILDCRAFT" && grep -q "build:'0.25'" <<<"$VERIFY"; then
               READY=1
-              echo "Live build 0.23 is deployed"
+              echo "Live build 0.25 is deployed"
               break
             fi
-            echo "Waiting for Pages deployment... ${i}/90"
+            echo "Waiting for Pages deployment... ${i}/100"
             sleep 2
           done
           if [ "$READY" -ne 1 ]; then
-            echo 'GitHub Pages did not expose build 0.23 in time'
+            echo 'GitHub Pages did not expose build 0.25 in time'
             exit 1
           fi
-      - name: Live GitHub Pages runtime + real multiplayer test
+      - name: Live GitHub Pages regression test
         shell: bash
         run: |
           set -euo pipefail
           CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.23' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
+          CHROME_BIN="$CHROME_BIN" NEXUS_EXPECTED_BUILD='0.25' NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-browser.mjs
+      - name: Live buildcraft + synergy test
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          CHROME_BIN="$CHROME_BIN" NEXUS_QA_URL="https://vyus3o.github.io/nexus-survival/?qa=${GITHUB_SHA}" node nexus-survival/qa-v25.mjs
